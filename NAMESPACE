@@ -1,0 +1,23 @@
+export(fitPiecewiseLinreg,pFlowMerge,checkForRemoteErrors,flowObj,ENT,NENT,BIC,ICL);
+import(flowClust);
+import(flowCore);
+import(methods);
+
+
+importMethodsFrom(rrcov,getData);
+importFrom(graphics, lines, par, plot);
+importFrom(stats, coefficients, lm);
+importFrom(utils,combn);
+
+exportMethods(
+    "getData",
+    "merge",
+    "plot",
+    "summary",
+    "show"
+)
+exportClasses(
+    "flowClust",
+     "flowMerge",
+     "flowObj" 
+)

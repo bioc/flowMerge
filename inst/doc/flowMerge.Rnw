@@ -1,0 +1,104 @@
+%\VignetteIndexEntry{flowMerge package}
+%\VignetteKeywords{Preprocessing,statistics}
+
+
+\documentclass{article}
+\usepackage{cite, hyperref}
+
+\title{Merging Mixture Components for Cell Population Identification in Flow Cytometry Data\\
+The flowMerge package}
+\author{Greg Finak, Raphael Gottardo}
+
+\begin{document}
+\setkeys{Gin}{width=1.0\textwidth, height=1.1\textwidth}
+
+\maketitle
+\begin{center}
+{\tt greg.finak@ircm.qc.ca, raphael.gottardo@ircm.qc.ca}
+\end{center}
+
+\textnormal{\normalfont}
+
+\tableofcontents
+\newpage
+
+
+\section{Licensing}
+
+Under the Artistic License, you are free to use and redistribute this software. 
+%\begin{itemize}
+%\item[] Insert paper citation.
+%\end{itemize}
+
+\section{Overview}
+
+We apply a cluster merging approach to perform automated gating of cell populations in flow cytometry data. The max BIC model fitting criterion for mixture models generally overestimates the number of cell populations (ie clusters) in flow cytometry data because the number of mixture components required to accurately model a distribution is usually greater than the number of distinct cell populations. Model fitting criteria based on the entropy, such as the ICL, provide better estimates of the number of clusters but tend to provide a poor fit to the underlying distribution. We combine these two approaches by merging mixture components from the max BIC fit based on an entropy criterion. This approach allows multiple mixture components to represent the same cell sub--population. Merged clusters are mixtures themselves and are summarized by a weighted combination of their component model parameters. The result is a mixture model that retains the good model fitting properties of the max BIC solution but the number of components more closely reflects the true number of distinct cell sub--populations.
+
+
+\section{Installation}
+
+\texttt{flowMerge} requires several packages to be pre--installed for full functionality. Specifically, \texttt{flowClust}, \texttt{flowCore}, \texttt{flowViz} and \texttt{snow} (for parallel computations) should be installed and functional.
+
+\section{Example: Cluster merging applied to the Rituximab data set}
+
+\subsection{The core function}  \label{core}
+
+To demonstrate the functionality we use a flow cytometry data set from a drug-screening project to identify agents that would enhance the anti-lymphoma activity of Rituximab, a therapeutic monoclonal antibody.  The data set is an object of class \texttt{flowFrame}; it consists of eight variables, among them only the two scattering variables (\texttt{FSC.H}, \texttt{SSC.H}) and two channels for the fluorochrome measurements (\texttt{FL1.H}, \texttt{FL3.H})  are of interest in this experiment.  The flowMerge package may be invoked upon the output of a call to flowClust, or it may be invoked on a \texttt{flowFrame} directly via the parallelized method \texttt{pFlowMerge}, which will itself call \texttt{flowClust} but throw away intermediate results. The following code will model one through 10 clusters using flowClust in a parallel manner using \texttt{snow}, choose the best BIC solution, merge clusters in the best BIC solution, choose the best merged solution based on the entropy criterion, then plot the results. This functionality is wrapped in the \texttt{pFlowMerge} function, with additional parallelization using \texttt{snow}. Additionally, if the snow cluster object passed to pFlowMerge is null, the non-parallel version of flowMerge is called.
+
+<<stage0, results=HIDE>>=
+library(flowMerge)
+@
+<<stage1, echo=TRUE>>=
+data(rituximab)
+summary(rituximab)
+flowClust.res <- flowClust(rituximab, varNames=c("FSC.H", "SSC.H"), K=1:5, B=1000,B.init=100,tol=1e-5,tol.init=1e-2,randomStart=50,nu=4,nu.est=1,trans=1);
+@
+flowClust.res is a \texttt{flowClust} object containing the 5 cluster solution. We extract the BIC of each solution with the internal \texttt{flowMerge} function \texttt{BIC}:
+
+<<stage2,echo=TRUE, fig=TRUE>>=
+plot(flowMerge:::BIC(flowClust.res),
+main="BIC for 1 through 10 cluster flowClust solutions",xlab="K",ylab="BIC");
+flowClust.maxBIC<-flowClust.res[[which.max(flowMerge:::BIC(flowClust.res))]];
+@
+Here we have extracted the max BIC solution, found for K=4. Before we run the cluster merging algorithm on the max BIC solution, we have to create a \texttt{flowObj} object from the \texttt{flowClust} result and the \texttt{flowFrame} data. We then run the \texttt{merge} function on the \texttt{flowObj} and extract then entropy of clustering from the merged results using the \texttt{ENT} function. The list of merged cluster solutions are input to the \texttt{fitPiecewiseLinreg} function. This function fits a piecewise linear regression to the entropy vs number of clusters and locates the position of the changepoint, if appropriate. Model selection is done via the BIC criterion. The results of the fit can be optionally plotted. 
+
+<<stage3,echo=T,fig=TRUE>>=
+flowClust.flowobj<-flowObj(flowClust.maxBIC,rituximab);
+flowClust.merge<-merge(flowClust.flowobj);
+i<-fitPiecewiseLinreg(flowClust.merge,plot=T);
+@
+Next we extract the merged solution with number of clusters equal to the position of the changepoint found by \texttt{fitPiecewiseLinreg}. This is the optimal merged solution based on the entropy criterion. The solution can be plotted with the \texttt{plot} method.
+<<stage4,echo=T,fig=T>>=
+par(mfrow=c(2,2));
+flowClust.mergeopt<-flowClust.merge[[i]];
+plot(flowClust.res[[4]],data=rituximab,main="Max BIC solution");
+plot(flowClust.res[[which.max(flowMerge:::ICL(flowClust.res))]],data=rituximab,main="Max ICL solution");
+plot(flowClust.mergeopt,level=0.9,pch=20,main="Merged Solution");
+@
+We see that the merged solution provides a better fit to the lymphocyte population than either the max BIC solution, or the max ICL solution. Additionally, debris and granulocytes are also clearly identified, in contrast to the ICL solution. We can extract the lymphocyte population and re-run flowClust and flowMerge on the fluorescence channels of the lymphocytes only. 
+<<stage5,echo=T>>=
+pop<-which(apply(apply(getEstimates(flowClust.mergeopt)$locations,2,function(x)order(x)==2),1,all));
+lymphocytes<-split(getData(flowClust.mergeopt),flowClust.mergeopt,population=list("lymphocytes"=pop))$lymphocytes;
+lymphocytes<-lymphocytes[,c(3,5)];
+l.flowC<-flowClust(lymphocytes,varNames=c("FL1.H","FL3.H"),K=1:8,B=1000,B.init=100,tol=1e-5,tol.init=1e-2,randomStart=50,nu=4,nu.est=1,trans=1);
+@
+The lymphocyte population is between the debris and the granulocytes in the forward and side--scatter dimensions. We can easily select it by examining the means of the three populations. We're only interested in the fluorescence channels, so we subset those with the \texttt{[]} operator inherited from \texttt{flowClust}. Finally, another call to \texttt{flowClust} performs a round of clustering on the lymphocyte sub--population.
+<<stage6,echo=T,fig=T>>=
+par(mfrow=c(2,2));
+l.flowO<-flowObj(l.flowC[[which.max(flowMerge:::BIC(l.flowC))]],lymphocytes);
+plot(l.flowO,main="max BIC solution",new.window=F,pch=20,level=0.9);
+plot(flowObj(l.flowC[[which.max(flowMerge:::ICL(l.flowC))]],lymphocytes),main="max ICL solution",new.window=F,pch=20,level=0.9);
+l.flowM<-merge(l.flowO);
+i<-fitPiecewiseLinreg(l.flowM,plot=T);
+plot(l.flowM[[i]],new.window=F,main="Best Merged Solution",pch=20,level=0.9);
+@
+We complete the analysis by choosing the best fitting merged solution and comparing it to the max BIC and max ICL solutions.
+\subsection{Parallel computations with the snow package}
+The methodology described in the first section is wrapped in a single function call with the additional benefits of utilizing the parallel processing capabilities of the \texttt{snow} package to speed up model fitting using \texttt{flowClust}. The function \texttt{pFlowMerge} can be passed multiple flowFrames in the form of a flowSet, or a list of flowFrames, as well as a \texttt{snow} cluster object, and the usual set of parameters required by \texttt{flowClust} to specify the model. The call parallelizes the computation of multiple models for each \texttt{flowFrame}. For example if one wants to fit all models starting from the one cluster model through to the ten cluster model for each of ten flowFrames, these will be distributed amongst the number of processors defined in the \texttt{snow} cluster object. Each processor will be assigned the calculation for a single flowFrame and model combination, until all processors are occupied. This speeds up computations significantly in a high--throughput analysis setting. 
+
+The resulting models are evaluated for the max BIC solutions for each \texttt{flowFrame}, the merging algorithm is run on each max BIC solution, the optimal merged solution is found as described in the example and returned to the user. The non--parallel version can be called via pFlowMerge with the ``cl'' argument equal to NULL.
+
+\subsection{Upcoming improvements}
+FlowMerge is undergoing continuous usability improvements, specifically with respect to the parallel computation framework. Figures of merit and other statistics will be output to allow the user to monitor the success or failure of the merging algorithm as it works through a large data set. A framework for semi--supervised selection of lymphocyte populations across multiple samples is also in the works. pFlowMerge does not do any sophisticated memory management, as such if you have a large data set, we suggest feeding it to pFlowMerge piece by piece, depending on the amount of RAM available to your machine / cluster.
+
+\end{document}
