@@ -3,21 +3,25 @@ setMethod("merge",signature=signature(x="flowObj",y="missing"),function(x,...){
   resultObject <- list()
   resultObject[[k]] <- as(x,"flowMerge");
   resultObject[[k]]@entropy <- -2*sum(resultObject[[k]]@z*log(resultObject[[k]]@z,base=2), na.rm=T)
-  d<-dim(resultObject[[k]]@mu)[1];
-  s<-apply(resultObject[[k]]@sigma,1,function(x){xx<-eigen(x);list(solve(xx$vectors%*%sqrt(diag(xx$values))%*%t(xx$vectors)));});
+  d <- dim(resultObject[[k]]@mu)[1];
+  s <- apply(resultObject[[k]]@sigma,1,function(x){xx<-eigen(x);list(solve(xx$vectors%*%sqrt(diag(xx$values))%*%t(xx$vectors)));});
   #resultObject[[k]]@ssd<- 2*sum(sapply(1:d,function(i)sapply(1:d,function(j)sqrt(sum((s[[i]][[1]]%*%resultObject[[k]]@mu[i,]-s[[j]][[1]]%*%resultObject[[k]]@mu[j,])^2)))))
 
-  if(k>2){
+  if(k > 2){
     for (kk in (k-1):2) resultObject[[kk]] <- mergeClusters(resultObject[[kk+1]], getData(resultObject[[k]]))
   }
-    resultObject[[1]]<- mergeClusters(resultObject[[2]],getData(resultObject[[k]]))
-    resultObject<-lapply(resultObject,updateU);
-    resultObject<-lapply(resultObject,flagOutliers);
+    resultObject[[1]] <- mergeClusters(resultObject[[2]], getData(resultObject[[k]]))
+    resultObject <- lapply(resultObject, updateU);
+    resultObject <- lapply(resultObject, flagOutliers);
   resultObject;
 })
 
-setGeneric("updateU",function(object){standardGeneric("updateU")});
-setMethod("updateU",signature=signature(object="flowMerge"),function(object){
+setMethod("split",signature=signature(f="flowMerge",x="missing"),function(f, drop = FALSE, population = NULL, split = NULL, rm.outliers = TRUE, ...){
+    split(f = as(f, "flowClust"), x = getData(f), population = population, split = split, rm.outliers = rm.outliers, ...);
+});
+
+setGeneric("updateU", function(object){standardGeneric("updateU")});
+setMethod("updateU", signature = signature(object = "flowMerge"), function(object){
   p<-object@K;
   q <- object@varNames;
   #q <- dim(o@mu)[2];
@@ -35,7 +39,7 @@ setMethod("updateU",signature=signature(object="flowMerge"),function(object){
 setMethod("getData",signature=signature(obj="flowObj"),function(obj){obj@DATA[["1"]]});
 setMethod("getData",signature=signature(obj="flowMerge"),function(obj){getData(as(obj,"flowObj"))});
 setMethod("plot",signature=signature(x="flowObj",y="missing"),
-          function(x,new.window=FALSE,...){
+          function(x,new.window=TRUE,...){
             #TODO include some code so that the dimension names are chosen correctly.
             comb<-as.matrix(combn(length(x@varNames),2));
             if(new.window){

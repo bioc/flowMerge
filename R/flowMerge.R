@@ -79,7 +79,7 @@ pFlowMerge<-function(flowData,cl,K=1:15,B.init=100,tol.init=1e-2,tol=1e-5,B=1000
                 stop("The result must be the output from a parallel call to flowClust");   
             }
         }else{
-            if(all(unlist(lapply(result,function(x)is(x,"flowClust"))))){
+            if(all(unlist(lapply(result,function(x)is(x,"flowClust")|is(x,"try-error"))))){
                 o<-flowObj(result[[which.max(BIC(result))]],flowData);
                 m<-merge(o);
                 i<-fitPiecewiseLinreg(m,plot=T);
@@ -188,51 +188,4 @@ NENT<-function(x)as.numeric(unlist(lapply(x,function(q)try(q@entropy/(q@K*dim(q@
 
 
 
-#fitPiecewiseLinreg<-function(entropy,plot=FALSE){
-#    l<-length(entropy);
-#    
-#    #Two cases.. if there's more than two clusters, or if there's just two clusters. 
-#    #If there are more than two clusters.. we can fit a changepoint model.
-#    if(l>3){
-#        #Try all positions for the changepoint, from 2..(l-1), and compute the sum of squared residuals
-#        r<-sapply(2:(l-1),function(b) try(sum(lm(entropy~I(1:l),subset=c(1:b))$residuals^2)+sum(lm(entropy~I(1:l),subset=c(b:l))$residuals^2)))
-#        r<-as.numeric(r);
-#        r2<-sum(lm(entropy~I(1:l))$residuals^2);
-#        bic<-c(l*log(r2/l)+2*log(l),l*log(r/l)+5*log(l));        
-#        m<-which.min(bic);        
-#        if(plot){
-#         c1<-coefficients(lm(entropy~I(1:l),subset=c(1:m)));c2<-coefficients(lm(entropy~I(1:l),subset=c(m:l)))
-#         color<-rep(1,l);
-#         color[m]<-2;
-#         plot(1:l,entropy,col=color,pch=20,main="Entropy of Clustering",xlab="Number of Clusters",ylab="Entropy");
-#         lines(1:m,1:m*c1[2]+c1[1],col="red");
-#         lines(m:l,m:l*c2[2]+c2[1],col="red");
-#         
-#        }
-#        return(m);
-#        if(m==1){
-#           warning("No changepoint found. Returning max BIC solution");
-#           return(l);
-#        }else{
-#            return(m);
-#        }        
-#    }else if(l==2){
-#        warning("Two clusters.. no changepoint possible. Returning max BIC solution");
-#        return(2);
-#    }else if(l==3)
-#    {
-#         r2<-sum(lm(entropy~I(1:l))$residuals^2);
-#         r<-sapply(2:(l-1),function(b) try(list(lm(entropy~I(1:l),subset=c(1:b)), lm(entropy~I(1:l),subset=c(b:l)))));
-#           a<-coefficients(r[[1]])[2];
-#           b<-coefficients(r[[2]])[2];
-#           angle<-atan(abs(a-b)/(1+a*b))*180/pi
-#           if(angle>1){
-#            warning("Possible changepoint detected by angle between line segments")
-#             return(2)                            
-#           }else{
-#            warning("No changepoint detected, returning max bic solution")
-#            return(3);            
-#           }
-#    }
-#}
 

@@ -3,7 +3,6 @@ import(flowClust);
 import(flowCore);
 import(methods);
 
-
 importMethodsFrom(rrcov,getData);
 importFrom(graphics, lines, par, plot);
 importFrom(stats, coefficients, lm);
@@ -14,7 +13,8 @@ exportMethods(
     "merge",
     "plot",
     "summary",
-    "show"
+    "show",
+    "split"
 )
 exportClasses(
     "flowClust",
