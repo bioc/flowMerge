@@ -121,6 +121,8 @@ setMethod("fitPiecewiseLinreg",signature=signature(x="list"),{
                 warning("No changepoint detected, returning max bic solution")
                 return(3);            
             }
+        }else if(l==1){
+         return(1);   
         }
     }
 })   
