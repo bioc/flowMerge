@@ -9,8 +9,8 @@ setMethod("merge",signature=signature(x="flowObj",y="missing"),function(x,...){
 
   if(k > 2){
     for (kk in (k-1):2) resultObject[[kk]] <- mergeClusters(resultObject[[kk+1]], getData(resultObject[[k]]))
-  }
     resultObject[[1]] <- mergeClusters(resultObject[[2]], getData(resultObject[[k]]))
+  }
     resultObject <- lapply(resultObject, updateU);
     resultObject <- lapply(resultObject, flagOutliers);
   resultObject;
