@@ -27,7 +27,11 @@ setMethod("updateU", signature = signature(object = "flowMerge"), function(objec
   p<-object@K;
   q <- object@varNames;
   #q <- dim(o@mu)[2];
-  dprime <- flowClust::box(exprs(object@DATA[["1"]])[,q],object@lambda);   
+  if(object@lambda!=1){
+    dprime <- flowClust::box(exprs(object@DATA[["1"]])[,q],object@lambda);
+  }else{
+    dprime<-exprs(object@DATA[["1"]])[,q]
+  }   
   u<-sapply(1:object@K,function(i){s<-solve(object@sigma[i,,]);apply(dprime,1,function(x)(x-object@mu[i,])%*%s%*%(x-object@mu[i,]))})
   if(!is.infinite(object@nu)){
       object@u <- (length(q)+object@nu)/(u+object@nu)

@@ -12,7 +12,7 @@ Merges mixture components from the \pkg{flowClust} framework based on the entrop
 \tabular{ll}{
 Package: \tab flowMerge\cr
 Type: \tab Package\cr
-Version: \tab 0.3.5\cr
+Version: \tab 0.3.6\cr
 Date: \tab 2009-04-07\cr
 License: \tab Artistic-2.0\cr
 LazyLoad: \tab yes\cr
