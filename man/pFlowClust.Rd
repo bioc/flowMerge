@@ -24,8 +24,8 @@ pFlowClust(flowData,cl, K = 1:15, B.init = 100, tol.init = 0.01, tol = 1e-05, B 
   \item{varNames}{ See \code{flowClust} documentation }
 }
 \details{
-  Calls flowClust via the \code{clusterMap} method of the \code{snow} package. Parallelizes the computation of multiple components for a single flowFrame in a loop over multiple flowFrames.
-}
+  Calls flowClust via the \code{clusterMap} method of the \code{snow} package. Parallelizes the computation of multiple components for a single flowFrame in a loop over multiple flowFrames. If the snow cluster is NULL, will make the call via mapply. 
+  }
 \value{
   Returns a list of lists of flowClust objects
   The outer list corresponds to the flowFrames passed into the method.

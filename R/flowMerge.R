@@ -59,9 +59,9 @@ pFlowMerge<-function(flowData,cl,K=1:15,B.init=100,tol.init=1e-2,tol=1e-5,B=1000
     }
     if(is.null(cl)){
         if(is(flowData,"list")|is(flowData,"flowSet")){
-            result<-lapply(as(flowData,"list"),function(x)flowClust(x,varNames=varNames,K=K,B.init=B.init,tol.init=tol.init,tol=tol,B=B,randomStart=randomStart,nu=nu,nu.est=nu.est,trans=trans));
+            result<-lapply(as(flowData,"list"),function(x)mapply(function(...)try(flowClust(...)),list(x),varNames=list(varNames),K=K,B.init=B.init,tol.init=tol.init,tol=tol,B=B,randomStart=randomStart,nu=nu,nu.est=nu.est,trans=trans));
         }else if(is(flowData,"flowFrame")){
-            result<-flowClust(flowData,varNames=varNames,K=K,B.init=B.init,tol.init=tol.init,tol=tol,B=B,randomStart=randomStart,nu=nu,nu.est=nu.est,trans=trans)
+          result<-mapply(function(...)try(flowClust(...)),list(flowData),varNames=list(varNames),K=K,B.init=B.init,tol.init=tol.init,tol=tol,B=B,randomStart=randomStart,nu=nu,nu.est=nu.est,trans=trans)
         }else{
             stop("flowData must be a flowFrame, list of flowFrames or flowSet")
         }   
@@ -174,7 +174,8 @@ mergeClusters <- function(object, data) {
         tempObject <- mergeClusters2(object, a, b, data)
         if (tempObject@entropy < minEnt) {
             minEnt <- tempObject@entropy
-            tempObject@merged <- c(tempObject@merged,list(a,b))
+            tempObject@merged<-unlist(lapply(list(Map(object)),function(x)length(which(x==a|x==b))))
+#            tempObject@merged <- c(tempObject@merged,list(a,b))
             resObject <- tempObject
         }
     }

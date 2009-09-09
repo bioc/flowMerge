@@ -18,7 +18,7 @@ NENT(x)
 \value{
     Returns a vector of normalized entropy values for the flowMerge objects.
   }
-\references{ Finak G, Bashasharti A, Brinkmann R, Gottardo R. Merging Mixture Model Components for Improved Cell Population Identification in High Throughput Flow Cytometry Data (Submitted)}
+\references{ Finak G, Bashasharti A, Brinkmann R, Gottardo R. Merging Mixture Model Components for Improved Cell Population Identification in High Throughput Flow Cytometry Data; Advances in Bioinformatics (To Appear)}
 \author{ Greg Finak \email{<greg.finak@ircm.qc.ca>} }
 \section{Warning}{This function doesn't do enough error checking and will try to extract the entropy from a list of anything.}
 \seealso{ \link{ENT},\link{merge},\link{flowMerge-class} }

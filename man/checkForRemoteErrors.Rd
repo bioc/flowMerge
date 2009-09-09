@@ -18,7 +18,7 @@ checkForRemoteErrors(val)
 \value{
   The result from the snow cluster node, or an object of type \code{try-error} if there was an error.
   }
-\references{ Finak G, Bashasharti A, Brinkmann R, Gottardo R. Merging Mixture Model Components for Improved Cell Population Identification in High Throughput Flow Cytometry Data (Submitted)}
+\references{ Finak G, Bashasharti A, Brinkmann R, Gottardo R. Merging Mixture Model Components for Improved Cell Population Identification in High Throughput Flow Cytometry Data; Advances in Bioinformatics (To Appear)}
 \author{ Greg Finak \email{<greg.finak@ircm.qc.ca>}}
 \seealso{ \link[snow]{checkForRemoteErrors} }
 

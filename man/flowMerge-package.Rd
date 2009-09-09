@@ -12,8 +12,8 @@ Merges mixture components from the \pkg{flowClust} framework based on the entrop
 \tabular{ll}{
 Package: \tab flowMerge\cr
 Type: \tab Package\cr
-Version: \tab 0.3.6\cr
-Date: \tab 2009-04-07\cr
+Version: \tab 0.4.1\cr
+Date: \tab 2009-09-07\cr
 License: \tab Artistic-2.0\cr
 LazyLoad: \tab yes\cr
 Depends: \tab methods\cr
@@ -30,7 +30,7 @@ Greg Finak \email{<greg.finak@ircm.qc.ca>}, Raphael Gottardo \email{<raphael.got
 
 Maintainer: Greg Finak \email{<greg.finak@ircm.qc.ca>}
 }
-\references{ Finak G, Bashasharti A, Brinkmann R, Gottardo R. Merging Mixture Model Components for Improved Cell Population Identification in High Throughput Flow Cytometry Data (Submitted)}
+\references{ Finak G, Bashasharti A, Brinkmann R, Gottardo R. Merging Mixture Model Components for Improved Cell Population Identification in High Throughput Flow Cytometry Data; Advances in Bioinformatics (To Appear)}
 \keyword{ package }
 \seealso{
 \code{\link[flowClust]{flowClust},\link{flowObj},\link{pFlowMerge},\link{pFlowClust},\link{fitPiecewiseLinreg},\link{merge},\link{getData},link{plot}}

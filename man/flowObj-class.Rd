@@ -46,7 +46,7 @@ Class \code{"\linkS4class{flowClust}"}, directly.
     \item{plot}{\code{signature(x = "flowObj", y = "missing")}: A simplified plotting method. Does not require specification of the data since it is contained in the \code{flowObj} object. Takes most of the same parameters as \code{plot.flowClust}, except the \code{data} parameter }
 	 }
 }
-\references{ Finak G, Bashasharti A, Brinkmann R, Gottardo R. Merging Mixture Model Components for Improved Cell Population Identification in High Throughput Flow Cytometry Data (Submitted)}
+\references{ Finak G, Bashasharti A, Brinkmann R, Gottardo R. Merging Mixture Model Components for Improved Cell Population Identification in High Throughput Flow Cytometry Data; Advances in Bioinformatics (To Appear)}
 \author{ Greg Finak \email{<greg.finak@ircm.qc.ca>}, Raphael Gottardo \email{<raphael.gottardo@ircm.qc.ca>} }
  
 \seealso{

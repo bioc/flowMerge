@@ -14,12 +14,12 @@ fitPiecewiseLinreg(x, plot=FALSE, ...)
   \item{\dots}{ Additional arguments not currently used. }
 }
 \details{
-  An S4 method that takes a list of \code{flowMerge} objects output by the \code{merge} method, extracts the entropy and fits a piecwise linear regression to the entropy vs number of clusters in order to find the postion of the changepoint. The location of the changepoint corresponds to the optimal merged cluster solution.
+  An S4 method that takes a list of \code{flowMerge} objects output by the \code{merge} method, extracts the entropy and fits a piecwise linear regression to the entropy vs number of clusters in order to find the postion of the changepoint. The location of the changepoint corresponds to the optimal merged cluster solution. The piecewise linear regression now is fitted to the entropy vs cumulative sum of merged observations at each number of clusters. This normalizes the change in entropy for the number of data points as described in Baudry et al.
 }
 \value{
   An \code{integer} value corresponding to the position of the changepoint.
   }
-\references{ Finak G, Bashasharti A, Brinkmann R, Gottardo R. Merging Mixture Model Components for Improved Cell Population Identification in High Throughput Flow Cytometry Data (Submitted)}\author{ Greg Finak \email{<greg.finak@ircm.qc.ca>} }
+\references{ Finak G, Bashasharti A, Brinkmann R, Gottardo R. Merging Mixture Model Components for Improved Cell Population Identification in High Throughput Flow Cytometry Data; Advances in Bioinformatics (To Appear)}\author{ Greg Finak \email{<greg.finak@ircm.qc.ca>} }
 \seealso{ \link{merge}}
 \examples{
 data(rituximab)

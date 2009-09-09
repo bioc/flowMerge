@@ -27,7 +27,7 @@ setMethod("updateU", signature = signature(object = "flowMerge"), function(objec
   p<-object@K;
   q <- object@varNames;
   #q <- dim(o@mu)[2];
-  if(object@lambda!=1){
+  if(length(object@lambda)==1){#test whether the transformation parameter is 1  (length 0)
     dprime <- flowClust::box(exprs(object@DATA[["1"]])[,q],object@lambda);
   }else{
     dprime<-exprs(object@DATA[["1"]])[,q]
@@ -69,7 +69,7 @@ setMethod("plot",signature=signature(x="flowMerge",y="missing"),
             }
             if(length(x@varNames)>2){
                 apply(comb,2,function(i){
-                    selectMethod("plot",signature=c(x="flowClust",y="missing"))(as(x,"flowClust"),data=getData(x),subset=i,xlab=parameters(getData(x))$desc[i[1]+2],ylab=parameters(getData(x))$desc[i[2]+2],...);
+                    selectMethod("plot",signature=c(x="flowClust",y="missing"))(as(x,"flowClust"),data=getData(x),subset=i,xlab=parameters(getData(x))$desc[i[1]],ylab=parameters(getData(x))$desc[i[2]],...);
              })
             }else{
                 selectMethod("plot",signature=c(x="flowClust",y="missing"))(as(x,"flowClust"),data=getData(x),xlab=parameters(getData(x))$desc[comb[1]],ylab=parameters(getData(x))$desc[comb[2]],...);
@@ -84,24 +84,26 @@ setMethod("fitPiecewiseLinreg",signature=signature(x="list"),{
             stop("x is not a valid list of flowMerge objects");        
         }
         entropy<-flowMerge:::ENT(x);
+        N<-(unlist(lapply(x,function(y)y@merged)))
+        N<-cumsum(c(0,N[-length(N)]))
         l<-length(entropy);
     
         #Two cases.. if there's more than two clusters, or if there's just two clusters. 
         #If there are more than two clusters.. we can fit a changepoint model.
         if(l>3){
             #Try all positions for the changepoint, from 2..(l-1), and compute the sum of squared residuals
-            r<-sapply(2:(l-1),function(b) try(sum(lm(entropy~I(1:l),subset=c(1:b))$residuals^2)+sum(lm(entropy~I(1:l),subset=c(b:l))$residuals^2)))
+            r<-sapply(2:(l-1),function(b) try(sum(lm(entropy~N,subset=c(1:b))$residuals^2)+sum(lm(entropy~N,subset=c(b:l))$residuals^2)))
             r<-as.numeric(r);
-            r2<-sum(lm(entropy~I(1:l))$residuals^2);
+            r2<-sum(lm(entropy~N)$residuals^2);
             bic<-c(l*log(r2/l)+2*log(l),l*log(r/l)+5*log(l));        
             m<-which.min(bic);        
             if(plot){
-                c1<-coefficients(lm(entropy~I(1:l),subset=c(1:m)));c2<-coefficients(lm(entropy~I(1:l),subset=c(m:l)))
+                c1<-coefficients(lm(entropy~N,subset=c(1:m)));c2<-coefficients(lm(entropy~N,subset=c(m:l)))
             color<-rep(1,l);
             color[m]<-2;
-            plot(1:l,entropy,col=color,pch=20,main="Entropy of Clustering",xlab="Number of Clusters",ylab="Entropy");
-            lines(1:m,1:m*c1[2]+c1[1],col="red");
-            lines(m:l,m:l*c2[2]+c2[1],col="red");         
+            plot(N,entropy,col=color,pch=20,main="Entropy of Clustering",xlab="Cumulative Number of Merged Observations",ylab="Entropy");
+            lines(N[1:m],N[1:m]*c1[2]+c1[1],col="red");
+            lines(N[m:l],N[m:l]*c2[2]+c2[1],col="red");         
             }
             return(m);
             if(m==1){
@@ -115,8 +117,8 @@ setMethod("fitPiecewiseLinreg",signature=signature(x="list"),{
             return(2);
         }else if(l==3)
         {
-            r2<-sum(lm(entropy~I(1:l))$residuals^2);
-            r<-sapply(2:(l-1),function(b) try(list(lm(entropy~I(1:l),subset=c(1:b)), lm(entropy~I(1:l),subset=c(b:l)))));
+            r2<-sum(lm(entropy~N)$residuals^2);
+            r<-sapply(2:(l-1),function(b) try(list(lm(entropy~N,subset=c(1:b)), lm(entropy~I(1:l),subset=c(b:l)))));
             a<-coefficients(r[[1]])[2];
             b<-coefficients(r[[2]])[2];
             angle<-atan(abs(a-b)/(1+a*b))*180/pi
