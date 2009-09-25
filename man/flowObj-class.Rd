@@ -8,7 +8,7 @@
 \title{Class "flowObj" }
 \description{A class inheriting from \code{flowClust} that groups the model and data in a single object.}
 \section{Objects from the Class}{
-Objects can be created by calls of the form \code{new("flowObj", ...). Has a convenience method \code{flowObj(flowClustObj, flowFrameObj)} for creating instances of the class.
+Objects can be created by calls of the form \code{new("flowObj", ...)}. Has a convenience method \code{flowObj(flowClustObj, flowFrameObj)} for creating instances of the class.
 }
 	
 }

@@ -33,7 +33,9 @@ pFlowMerge(flowData, cl, K = 1:15, B.init = 100, tol.init = 0.01, tol = 1e-05, B
 \author{ Greg Finak \email{<greg.finak@ircm.qc.ca>}}
 \section{Warning}{This function does not do any special memory management. A large data set will likely cause it to run out of memory and start swapping incessantly. If you have lots of data, it's best to feed it piecewise to pFlowClust.
 }
-\seealso{ \link{pFlowClust},\link[flowClust]{flowClust},\link{merge},\link[snow]{snow},\link{fitPiecewiseLinreg}}
+\seealso{
+  \link{pFlowClust},\link[flowClust]{flowClust},\link{merge},\pkg{snow},
+  \link{fitPiecewiseLinreg}}  
 \examples{
 data(rituximab)
 #Parallelized call below:

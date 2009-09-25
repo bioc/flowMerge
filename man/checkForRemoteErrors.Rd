@@ -20,6 +20,6 @@ checkForRemoteErrors(val)
   }
 \references{ Finak G, Bashasharti A, Brinkmann R, Gottardo R. Merging Mixture Model Components for Improved Cell Population Identification in High Throughput Flow Cytometry Data; Advances in Bioinformatics (To Appear)}
 \author{ Greg Finak \email{<greg.finak@ircm.qc.ca>}}
-\seealso{ \link[snow]{checkForRemoteErrors} }
+\seealso{ \link[snow:snow-internal]{checkForRemoteErrors} }
 
 \keyword{ misc }

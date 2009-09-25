@@ -34,7 +34,7 @@ pFlowClust(flowData,cl, K = 1:15, B.init = 100, tol.init = 0.01, tol = 1e-05, B 
  }
 \references{ Finak G, Bashasharti A, Brinkmann R, Gottardo R. Merging Mixture Model Components for Improved Cell Population Identification in High Throughput Flow Cytometry Data (Submitted)}
 \author{ Greg Finak \email{<greg.finak@ircm.qc.ca>} }
-\seealso{ \link[flowClust]{flowClust},\link[snow]{snow} }
+\seealso{ \link[flowClust]{flowClust},\pkg{snow} }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{misc}
