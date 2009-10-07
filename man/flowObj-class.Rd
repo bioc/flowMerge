@@ -11,7 +11,7 @@
 Objects can be created by calls of the form \code{new("flowObj", ...)}. Has a convenience method \code{flowObj(flowClustObj, flowFrameObj)} for creating instances of the class.
 }
 	
-}
+
 \section{Slots}{
 	 \describe{
     \item{\code{DATA}:}{An \code{"environment"} that holds a pointer to the \code{flowFrame} data in position \code{[[1]]}. }
