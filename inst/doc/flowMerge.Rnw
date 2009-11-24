@@ -26,9 +26,9 @@ The flowMerge package}
 \section{Licensing}
 
 Under the Artistic License, you are free to use and redistribute this software. 
-%\begin{itemize}
-%\item[] Insert paper citation.
-%\end{itemize}
+\begin{itemize}
+\item[] Greg Finak, Ali Bashashati, Ryan Brinkman, and Raphaël Gottardo, “Merging Mixture Components for Cell Population Identification in Flow Cytometry,” Advances in Bioinformatics, vol. 2009, Article ID 247646, 12 pages, 2009. doi:10.1155/2009/247646
+\end{itemize}
 
 \section{Overview}
 
@@ -57,7 +57,7 @@ flowClust.res is a \texttt{flowClust} object containing the 5 cluster solution. 
 
 <<stage2,echo=TRUE, fig=TRUE>>=
 plot(flowMerge:::BIC(flowClust.res),
-main="BIC for 1 through 10 cluster flowClust solutions",xlab="K",ylab="BIC");
+main="BIC for 1 through 10 cluster flowClust solutions",xlab="K",ylab="BIC",type="o");
 flowClust.maxBIC<-flowClust.res[[which.max(flowMerge:::BIC(flowClust.res))]];
 @
 Here we have extracted the max BIC solution, found for K=4. Before we run the cluster merging algorithm on the max BIC solution, we have to create a \texttt{flowObj} object from the \texttt{flowClust} result and the \texttt{flowFrame} data. We then run the \texttt{merge} function on the \texttt{flowObj} and extract then entropy of clustering from the merged results using the \texttt{ENT} function. The list of merged cluster solutions are input to the \texttt{fitPiecewiseLinreg} function. This function fits a piecewise linear regression to the entropy vs number of clusters and locates the position of the changepoint, if appropriate. Model selection is done via the BIC criterion. The results of the fit can be optionally plotted. 

@@ -15,7 +15,7 @@ setMethod("merge",signature=signature(x="flowObj",y="missing"),function(x,...){
   }
     resultObject <- lapply(resultObject, updateU);
     resultObject <- lapply(resultObject, flagOutliers);
-    resultObject<-lapply(resultObject,function(x)ruleOutliers(x)<-list(level=0.9));
+    resultObject<-lapply(resultObject,function(x){ruleOutliers(x)<-list(level=0.9);x});
   resultObject;
 })
 
