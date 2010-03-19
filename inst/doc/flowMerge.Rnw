@@ -27,7 +27,7 @@ The flowMerge package}
 
 Under the Artistic License, you are free to use and redistribute this software. 
 \begin{itemize}
-\item[] Greg Finak, Ali Bashashati, Ryan Brinkman, and Raphaël Gottardo, “Merging Mixture Components for Cell Population Identification in Flow Cytometry,” Advances in Bioinformatics, vol. 2009, Article ID 247646, 12 pages, 2009. doi:10.1155/2009/247646
+\item[] Greg Finak, Ali Bashashati, Ryan Brinkman, and Raphael Gottardo. Merging Mixture Components for Cell Population Identification in Flow Cytometry.  Advances in Bioinformatics, vol. 2009, Article ID 247646, 12 pages, 2009. doi:10.1155/2009/247646
 \end{itemize}
 
 \section{Overview}
@@ -100,5 +100,11 @@ The resulting models are evaluated for the max BIC solutions for each \texttt{fl
 
 \subsection{Upcoming improvements}
 FlowMerge is undergoing continuous usability improvements, specifically with respect to the parallel computation framework. Figures of merit and other statistics will be output to allow the user to monitor the success or failure of the merging algorithm as it works through a large data set. A framework for semi--supervised selection of lymphocyte populations across multiple samples is also in the works. pFlowMerge does not do any sophisticated memory management, as such if you have a large data set, we suggest feeding it to pFlowMerge piece by piece, depending on the amount of RAM available to your machine / cluster.
+
+\subsection{Frequently Asked Questions}
+Q: How do I use pFlowMerge? 
+
+A: pFlowMerge is implemented to parallelize computations for flowSets or lists of flowFrames, rather than for multiple clusters in a single flowFrame. For example, if \texttt{data}is \texttt{flowSet} of ten \texttt{flowFrames} and \texttt{cl} is a \texttt{snow} cluster of ten nodes, then, running \texttt{pFlowMerge(cl,flowSet,varNames=c("A","B","C"),K=1:10)} will distribute the ten \texttt{flowFrames} across the ten nodes, and each node will evaluate the model for \texttt{K=1:10} clusters. If you wish to parallelize the \texttt{K=1:10} cluster computations across multiple nodes, you would need to make function call that utilizes \texttt{snow} functionality directly, such as: \texttt{clusterMap(cl,function(...)try(flowClust(...)),list(flowFrame),varNames=list(c("A","B","C"),K=1:10)}. This will distribute the calculation of \texttt{flowFrame} for each value of \texttt{K=1} through \texttt{K=10} components across the ten nodes of \texttt{cl}. The addition of the \texttt{try()} wrapper ensures the function will return even if an individual model fails to converge for a given value of \texttt{K}. Alternately, if you wish to do the above for a \texttt{flowSet} you will need to replicate each element of the \texttt{flowSet} \texttt{K$_{max}$} times, where \texttt{K$_{max}$} is the total number of model components to evaluate per \texttt{flowFrame}. Again, an example: \texttt{clusterMap(cl,function(...)try(flowClust(...)),rep(as(flowSet,"list"),each=length(Kvector)),varNames=list(c("A","B","C")),K=Kvector)}. Please remember to ensure \texttt{flowClust} is loaded in each R work environment on the nodes by calling \texttt{clusterEvalQ(cl,library(flowClust))}.
+
 
 \end{document}
