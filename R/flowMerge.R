@@ -52,7 +52,7 @@ stop("flowData should be a flowFrame, list of flowFrames, or flowSet");
 result;
 }
 
-pFlowMerge<-function(flowData,cl,K=1:15,B.init=100,tol.init=1e-2,tol=1e-5,B=1000,randomStart=50,nu=4,nu.est=1,trans=1,varNames=NA){
+pFlowMerge<-function(flowData,cl,K=1:15,B.init=100,tol.init=1e-2,tol=1e-5,B=500,randomStart=10,nu=4,nu.est=0,trans=1,varNames=NA){
     if(!is.null(cl)){
         initPFlowMerge(cl);
         result<-pFlowClust(flowData,cl,varNames=varNames,K=K,B.init=B.init,tol.init=tol.init,tol=tol,B=B,randomStart=randomStart,nu=nu,nu.est=nu.est,trans=trans);    
@@ -153,14 +153,14 @@ mergeClusters2 <- function(object, a, b, data){
     # update uncertainty -- now holds the penalized logLikelihood for the merged cluster -- Uncertainty is long to compute.. currently done outside in an external function, and not for each merged component, since only important for the one to be kept
 
     ##This computes the sum of squared deviations between clusters. Some code to treat case of a single cluster.
-    d<-dim(object@mu)[1]
-    if(length(dim(object@sigma))==2){
-      xx <- eigen(object@sigma);
-      s<-solve(xx$vectors%*%sqrt(diag(xx$values))%*%t(xx$vectors));
-    }else{
-      s <- apply(object@sigma,1,function(x){xx<-eigen(x);list(solve(xx$vectors%*%sqrt(diag(xx$values))%*%t(xx$vectors)));});
-    }
-    m<-object@mu
+#    d<-dim(object@mu)[1]
+#    if(length(dim(object@sigma))==2){
+#        xx <- eigen(object@sigma);
+#        s<-solve(xx$vectors%*%sqrt(diag(xx$values))%*%t(xx$vectors));
+#    }else{
+#        s <- apply(object@sigma,1,function(x){xx<-eigen(x);list(solve(xx$vectors%*%sqrt(diag(xx$values))%*%t(xx$vectors)));});
+#    }
+#    m<-object@mu
 
     object
 }
