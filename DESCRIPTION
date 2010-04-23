@@ -12,4 +12,3 @@ Collate: SetClasses.R SetMethods.R flowMerge.R
 biocViews: Bioinformatics, Clustering, FlowCytometry
 Depends: flowClust, flowCore, methods,snow
 Imports:rrcov, flowClust,flowCore, graphics, methods, rrcov, stats, utils 
-Packaged: 2010-03-25 13:59:42 UTC; finakg
