@@ -1,7 +1,7 @@
 Package: flowMerge
 Type: Package
 Title: Cluster Merging for Flow Cytometry Data 
-Version: 1.2.0
+Version: 1.3.1
 Date: 2010-04-16
 Author: Greg Finak <greg.finak@ircm.qc.ca>, Raphael Gottardo <raphael.gottardo@ircm.qc.ca>
 Maintainer: Greg Finak <greg.finak@ircm.qc.ca>
@@ -12,4 +12,3 @@ Collate: SetClasses.R SetMethods.R flowMerge.R
 biocViews: Bioinformatics, Clustering, FlowCytometry
 Depends: flowClust, flowCore, methods,snow
 Imports:rrcov, flowClust,flowCore, graphics, methods, rrcov, stats, utils 
-Packaged: 2010-03-25 13:59:42 UTC; finakg
