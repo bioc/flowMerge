@@ -1,3 +1,6 @@
+map<-function(z,...){
+apply(z,1,function(x){w<-(which(x==max(x)));if(length(w)!=0){w}else{NA}})
+}
 setMethod("merge",signature=signature(x="flowObj",y="missing"),function(x,...){
   k <- x@K;
   resultObject <- list()
@@ -39,7 +42,7 @@ setMethod("updateU", signature = signature(object = "flowMerge"), function(objec
   }else{
     object@u<-u;
   }
-  object@label <- map(object@z,warn=FALSE);
+  object@label <- map(object@z);
   object;
 })
 
