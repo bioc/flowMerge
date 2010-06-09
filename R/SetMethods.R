@@ -51,32 +51,32 @@ setMethod("getData",signature=signature(obj="flowMerge"),function(obj){getData(a
 setMethod("plot",signature=signature(x="flowObj",y="missing"),
           function(x,new.window=TRUE,...){
             #TODO include some code so that the dimension names are chosen correctly.
-            comb<-as.matrix(combn(length(x@varNames),2));
+            comb<-as.matrix(combn(x@varNames,2));
             if(new.window){
             par(mfrow=c(ceiling(sqrt(dim(comb)[2])),ceiling(sqrt(dim(comb)[2]))))
             }
             if(length(x@varNames)>2){
                 apply(comb,2,function(i){
-                    selectMethod("plot",signature=c(x="flowClust",y="missing"))(as(x,"flowClust"),data=getData(x),subset=i,xlab=parameters(getData(x))$desc[i[1]+2],ylab=parameters(getData(x))$desc[i[2]+2],...);
+                    selectMethod("plot",signature=c(x="flowClust",y="missing"))(as(x,"flowClust"),data=getData(x),subset=i,...);
              })
             }else{
-                selectMethod("plot",signature=c(x="flowClust",y="missing"))(as(x,"flowClust"),data=getData(x),xlab=parameters(getData(x))$desc[comb[1]],ylab=parameters(getData(x))$desc[comb[2]],...);
+                selectMethod("plot",signature=c(x="flowClust",y="missing"))(as(x,"flowClust"),data=getData(x),...);
             }
           })
 
 setMethod("plot",signature=signature(x="flowMerge",y="missing"),
           function(x,new.window=FALSE,...){
             #TODO include some code so that the dimension names are chosen correctly.
-            comb<-as.matrix(combn(length(x@varNames),2));
+            comb<-as.matrix(combn(x@varNames,2));
             if(new.window){
             par(mfrow=c(ceiling(sqrt(dim(comb)[2])),ceiling(sqrt(dim(comb)[2]))))
             }
             if(length(x@varNames)>2){
                 apply(comb,2,function(i){
-                    selectMethod("plot",signature=c(x="flowClust",y="missing"))(as(x,"flowClust"),data=getData(x),subset=i,xlab=parameters(getData(x))$desc[i[1]],ylab=parameters(getData(x))$desc[i[2]],...);
+                    selectMethod("plot",signature=c(x="flowClust",y="missing"))(as(x,"flowClust"),data=getData(x),subset=i,...);
              })
             }else{
-                selectMethod("plot",signature=c(x="flowClust",y="missing"))(as(x,"flowClust"),data=getData(x),xlab=parameters(getData(x))$desc[comb[1]],ylab=parameters(getData(x))$desc[comb[2]],...);
+                selectMethod("plot",signature=c(x="flowClust",y="missing"))(as(x,"flowClust"),data=getData(x),...);
             }
           })
           
