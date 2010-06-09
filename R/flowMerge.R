@@ -40,10 +40,10 @@ if(is(flowData,"list")){
 if(all(unlist(lapply(flowData,function(x)is(x,"flowFrame"))))){
 result<-lapply(flowData,function(d)clusterMap(cl,function(...)try(flowClust(...)),list(d),varNames=list(varNames),K=K,B=B,tol.init=tol.init,tol=tol,B.init=B.init,randomStart=randomStart,nu=nu,nu.est=nu.est,trans=trans));
 }}
-if(is(flowData,"flowSet")){
+else if(is(flowData,"flowSet")){
 result<-fsApply(flowData,function(d)clusterMap(cl,function(...)try(flowClust(...)),list(d),varNames=list(varNames),K=K,B=B,tol.init=tol.init,tol=tol,B.init=B.init,randomStart=randomStart,nu=nu,nu.est=nu.est,trans=trans));
 }
-if(is(flowData,"flowFrame")){
+else if(is(flowData,"flowFrame")){
 result<-clusterMap(cl,function(...)try(flowClust(...)),list(flowData),varNames=list(varNames),K=K,B=B,tol.init=tol.init,tol=tol,B.init=B.init,randomStart=randomStart,nu=nu,nu.est=nu.est,trans=trans)
 }
 else{
@@ -70,11 +70,11 @@ pFlowMerge<-function(flowData,cl,K=1:15,B.init=100,tol.init=1e-2,tol=1e-5,B=500,
     if(is(result,"list")){##This nested code tests if the output is a list of lists of flowClust results. Inelegant, maybe, but that's R for you.
         if(all(unlist(lapply(result,function(x)is(x,"list"))))){
             if(all(unlist(lapply(result,function(x)lapply(x,function(y)is(y,"flowClust")))))){
-                tmp<-lapply(result,function(x)x[[which.max(x)]]);
+                tmp<-lapply(result,function(x)x[[which.max(BIC(x))]]);
                 ##result should be a list of flowClust objects, one per flowFrame input
                 o<-sapply(1:length(tmp),function(i)flowObj(tmp[[i]],flowData[[i]]));
-                m<-lapply(o,function(x)merge(o));
-                result<-lapply(m,function(x){i<-fitPiecewiseLinreg(m,plot=T);m[[i]]});
+                m<-lapply(o,function(x)merge(x));
+                result<-lapply(m,function(x){i<-fitPiecewiseLinreg(x,plot=T);x[[i]]});
             }else{
                 stop("The result must be the output from a parallel call to flowClust");   
             }
