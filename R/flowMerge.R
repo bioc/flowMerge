@@ -107,8 +107,6 @@ flowObj<-function(flowC=NULL,flowF=NULL){
   o <- new("flowObj",flowC);
   o@DATA=new.env(hash=TRUE,parent=emptyenv());
   o@DATA[["1"]]<-flowF;
-  lockEnvironment(o@DATA)
-  lockBinding("DATA",o@DATA)
   o;
 }
 
