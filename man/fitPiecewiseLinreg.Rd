@@ -5,12 +5,13 @@
  Fits a two--component piecewise linear regression to the entropy vs number of clusters for a list of merged cluster solutions.
  }
  \usage{
-fitPiecewiseLinreg(x, plot=FALSE, ...)
+fitPiecewiseLinreg(x, plot=FALSE, normalized=TRUE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{ A "list" of \code{flowMerge} objects for \code{1} through \code{K} clusters derived from a single max BIC \code{flowObj} or \code{flowClust} object.  }
   \item{plot}{ A \code{logical} indicating whether to plot the fit or not. Default is FALSE. }
+  \item{normalized}{ A \code{logical} indicating whether the merging should be done using the normalized or unnormalized entropy}
   \item{\dots}{ Additional arguments not currently used. }
 }
 \details{
