@@ -47,18 +47,19 @@ To demonstrate the functionality we use a flow cytometry data set from a drug-sc
 
 <<stage0, results=HIDE>>=
 library(flowMerge)
+library(multicore)
 @
 <<stage1, echo=TRUE>>=
 data(rituximab)
 summary(rituximab)
-flowClust.res <- flowClust(rituximab, varNames=c("FSC.H", "SSC.H"), K=1:5, B=1000,B.init=100,tol=1e-5,tol.init=1e-2,randomStart=50,nu=4,nu.est=1,trans=1);
+flowClust.res <- flowClust(rituximab, varNames=c(colnames(rituximab)[1:2]), K=1:5);
 @
 flowClust.res is a \texttt{flowClust} object containing the 5 cluster solution. We extract the BIC of each solution with the internal \texttt{flowMerge} function \texttt{BIC}:
 
 <<stage2,echo=TRUE, fig=TRUE>>=
 plot(flowMerge:::BIC(flowClust.res),
-main="BIC for 1 through 10 cluster flowClust solutions",xlab="K",ylab="BIC",type="o");
-flowClust.maxBIC<-flowClust.res[[which.max(flowMerge:::BIC(flowClust.res))]];
+main="BIC for 1 through 5 cluster flowClust solutions",xlab="K",ylab="BIC",type="o");
+flowClust.maxBIC<-flowClust.res[[which.max(BIC(flowClust.res))]];
 @
 Here we have extracted the max BIC solution, found for K=4. Before we run the cluster merging algorithm on the max BIC solution, we have to create a \texttt{flowObj} object from the \texttt{flowClust} result and the \texttt{flowFrame} data. We then run the \texttt{merge} function on the \texttt{flowObj} and extract then entropy of clustering from the merged results using the \texttt{ENT} function. The list of merged cluster solutions are input to the \texttt{fitPiecewiseLinreg} function. This function fits a piecewise linear regression to the entropy vs number of clusters and locates the position of the changepoint, if appropriate. Model selection is done via the BIC criterion. The results of the fit can be optionally plotted. 
 
@@ -97,6 +98,9 @@ We complete the analysis by choosing the best fitting merged solution and compar
 The methodology described in the first section is wrapped in a single function call with the additional benefits of utilizing the parallel processing capabilities of the \texttt{snow} package to speed up model fitting using \texttt{flowClust}. The function \texttt{pFlowMerge} can be passed multiple flowFrames in the form of a flowSet, or a list of flowFrames, as well as a \texttt{snow} cluster object, and the usual set of parameters required by \texttt{flowClust} to specify the model. The call parallelizes the computation of multiple models for each \texttt{flowFrame}. For example if one wants to fit all models starting from the one cluster model through to the ten cluster model for each of ten flowFrames, these will be distributed amongst the number of processors defined in the \texttt{snow} cluster object. Each processor will be assigned the calculation for a single flowFrame and model combination, until all processors are occupied. This speeds up computations significantly in a high--throughput analysis setting. 
 
 The resulting models are evaluated for the max BIC solutions for each \texttt{flowFrame}, the merging algorithm is run on each max BIC solution, the optimal merged solution is found as described in the example and returned to the user. The non--parallel version can be called via pFlowMerge with the ``cl'' argument equal to NULL.
+
+\subsection{Recent updates}
+The flowMerge algorithm has been updated to increase speed and now supports parallelization when the \texttt{foreach} package is installed. FlowMerge now also supports merging on the mahalanobis distance metric as well as the entropy. These can be specified to the merging algorithm via the optional \texttt{metric}  argument \texttt{(metric=c("entropy","mahalanobis")} to the \texttt{merge()} function. The default is to use "entropy".
 
 \subsection{Upcoming improvements}
 FlowMerge is undergoing continuous usability improvements, specifically with respect to the parallel computation framework. Figures of merit and other statistics will be output to allow the user to monitor the success or failure of the merging algorithm as it works through a large data set. A framework for semi--supervised selection of lymphocyte populations across multiple samples is also in the works. pFlowMerge does not do any sophisticated memory management, as such if you have a large data set, we suggest feeding it to pFlowMerge piece by piece, depending on the amount of RAM available to your machine / cluster.

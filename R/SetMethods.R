@@ -1,47 +1,91 @@
 map<-function(z,...){
 apply(z,1,function(x){w<-(which(x==max(x)));if(length(w)!=0){w}else{NA}})
 }
-setMethod("merge",signature=signature(x="flowObj",y="missing"),function(x,...){
+setMethod("merge",signature=signature(x="flowObj",y="missing"),function(x,metric="entropy",...){
+    metric<-match.arg(metric,c("entropy","mahalanobis"));
   k <- x@K;
-  resultObject <- list()
+  resultObject <- as.list(rep(0,k))
   resultObject[[k]] <- as(x,"flowMerge");
   resultObject[[k]]@entropy <- -2*sum(resultObject[[k]]@z*log(resultObject[[k]]@z,base=2), na.rm=T)
   d <- dim(resultObject[[k]]@mu)[1];
-  s <- apply(resultObject[[k]]@sigma,1,function(x){xx<-eigen(x);list(solve(xx$vectors%*%sqrt(diag(xx$values))%*%t(xx$vectors)));});
+  s <- apply(resultObject[[k]]@sigma,1,function(x){xx<-eigen(x);list(solve(xx$vectors%*%sqrt(diag(xx$values))%*%t(xx$vectors),LINPACK=TRUE));});
   #resultObject[[k]]@ssd<- 2*sum(sapply(1:d,function(i)sapply(1:d,function(j)sqrt(sum((s[[i]][[1]]%*%resultObject[[k]]@mu[i,]-s[[j]][[1]]%*%resultObject[[k]]@mu[j,])^2)))))
 
   if(k > 2){
-    for (kk in (k-1):2) resultObject[[kk]] <- mergeClusters(resultObject[[kk+1]], getData(resultObject[[k]]))
-    resultObject[[1]] <- mergeClusters(resultObject[[2]], getData(resultObject[[k]]))
+    for (kk in (k-1):2) {
+        tmp<-mergeClusters(resultObject[[kk+1]],metric=metric)
+        resultObject[[kk]]<-mergeClusters2(resultObject[[kk+1]],tmp[[1]],tmp[[2]])
+        resultObject[[kk]]@merged<-unlist(lapply(list(Map(resultObject[[kk]])),function(x)length(which(x==tmp[[1]]))))
+        #resultObject@merged <- c(resultObject[[kk+1]]@merged,list(tmp[[1]],tmp[[2]]))
+
+        message("Merged to ",kk," clusters");
+    }
+    tmp<- mergeClusters(resultObject[[2]],metric=metric)
+    resultObject[[1]]<-mergeClusters2(resultObject[[2]],tmp[[1]],tmp[[2]])
+    resultObject[[1]]@merged<-unlist(lapply(list(Map(resultObject[[1]])),function(x)length(which(x==tmp[[1]]))))
+    message("Merged to 1 clusters");
   }else if(k==2){
-    resultObject[[1]] <- mergeClusters(resultObject[[2]], getData(resultObject[[k]])) 
+    #resultObject[[1]] <- mergeClusters(resultObject[[2]], getData(resultObject[[k]])) 
+    tmp<- mergeClusters(resultObject[[2]],metric=metric)
+    resultObject[[1]]<-mergeClusters2(resultObject[[2]],tmp[[1]],tmp[[2]])
+    resultObject[[1]]@merged<-unlist(lapply(list(Map(resultObject[[1]])),function(x)length(which(x==tmp[[1]]))))
+    message("Merged to 1 clusters");
   }
-    resultObject <- lapply(resultObject, updateU);
-    resultObject <- lapply(resultObject, flagOutliers);
-    resultObject<-lapply(resultObject,function(x){ruleOutliers(x)<-list(level=0.9);x});
-  resultObject;
+    message("Updating model statistics");
+    for(i in 1:length(resultObject)){
+        resultObject[[i]]<-updateU(resultObject[[i]]);
+        resultObject[[i]]<-flagOutliers(resultObject[[i]]);
+        ruleOutliers(resultObject[[i]])<-list(level=0.9);
+        message("Updated model ",i);
+    }
+#    resultObject <- lapply(resultObject, updateU);
+#    resultObject <- lapply(resultObject, flagOutliers);
+#    resultObject <- lapply(resultObject,function(x){ruleOutliers(x)<-list(level=0.9);x});
+    resultObject;
 })
 
 setMethod("split",signature=signature(x="missing",f="flowMerge"),function(f, drop = FALSE, population=NULL,split = NULL, rm.outliers = TRUE, ...){
     split( x = getData(f),f = as(f, "flowClust"), population=NULL, split = split, rm.outliers = rm.outliers, ...);
 });
 
+.computeU<-function(res,data){
+    u<-matrix(0,dim(res@z)[1],res@K);
+    for(i in (1:res@K)){
+    u[,i]<-(res@nu+dim(res@mu)[2])/(res@nu+dmvt((data),res@mu[i,],res@sigma[i,,],res@nu,res@lambda)$md);
+    #message("Updated cluster ",i);
+    }
+    u;
+   }
+
 setGeneric("updateU", function(object){standardGeneric("updateU")});
 setMethod("updateU", signature = signature(object = "flowMerge"), function(object){
   p<-object@K;
   q <- object@varNames;
   #q <- dim(o@mu)[2];
-  if(length(object@lambda)==1){#test whether the transformation parameter is 1  (length 0)
-    dprime <- flowClust::box(exprs(object@DATA[["1"]])[,q],object@lambda);
-  }else{
+#  if(length(object@lambda)==1){#test whether the transformation parameter is 1  (length 0)
+#    dprime <- flowClust::box(exprs(object@DATA[["1"]])[,q],object@lambda);
+#  }else{
+   
     dprime<-exprs(object@DATA[["1"]])[,q]
-  }   
-  u<-sapply(1:object@K,function(i){s<-solve(object@sigma[i,,]);apply(dprime,1,function(x)(x-object@mu[i,])%*%s%*%(x-object@mu[i,]))})
-  if(!is.infinite(object@nu)){
-      object@u <- (length(q)+object@nu)/(u+object@nu)
-  }else{
+#  }
+  #if(require(multicore)&require(doMC)){
+   # registerDoMC();
+    #u<-do.call(cbind,mclapply(as.list(1:object@K),function(i){s<-solve(object@sigma[i,,],LINPACK=TRUE);apply(dprime,1,function(x)(x-object@mu[i,])%*%s%*%(x-object@mu[i,]))}))
+     u<-.computeU(object,dprime);
+ #    if(!is.infinite(object@nu)){
+ #     object@u <- (length(q)+object@nu)/(u+object@nu)
+ #    }else{
     object@u<-u;
-  }
+ #    }
+
+#  }else{
+#      u<-sapply(1:object@K,function(i){s<-solve(object@sigma[i,,],LINPACK=TRUE);apply(dprime,1,function(x)(x-object@mu[i,])%*%s%*%(x-object@mu[i,]))})
+#     if(!is.infinite(object@nu)){
+#      object@u <- (length(q)+object@nu)/(u+object@nu)
+#     }else{
+#    object@u<-u;
+#     }
+#  }
   object@label <- map(object@z);
   object;
 })

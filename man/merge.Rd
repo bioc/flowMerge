@@ -1,6 +1,7 @@
 \name{merge}
 \alias{merge,flowObj}
 \alias{merge}
+\alias{merge,flowObj,metric}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ Merge clusters in flow cytometry data }
 \description{
@@ -13,10 +14,10 @@ merge(x,y,...)
 \arguments{
   \item{x}{ A \code{flowObj} object created from a \code{flowClust} object and a \code{flowFrame} using the \code{flowObj} constructor. }
   \item{y}{missing}
-  \item{\dots}{Additional arguments, not currently used. }
+  \item{\dots}{Additional arguments. i.e. \code{metric="entropy"|"mahalanobis"}}
 }
 \details{
-  Run the cluster merging algorithm on the max BIC solution from a call to \code{flowClust}. 
+  Run the cluster merging algorithm on the max BIC solution from a call to \code{flowClust}. The optional argument, \code{metric} specifies the measure used for clustering. Either "mahalanobis" or "entropy". Defaults to "entropy".
 }
 \value{
   A list of unnamed \code{flowMerge} objects. The first element of the list corresponds to the 1--cluster merged solution. The second element corresponds to the 2--cluster merged solution, and so on.

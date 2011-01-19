@@ -6,14 +6,13 @@
   Internal function not meant to be called by the user.
 }
 \usage{
-mergeClusters2(object, a, b, data)
+mergeClusters2(object, a, b)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{object}{ Internal function not meant to be called by the user. }
   \item{a}{ Internal function not meant to be called by the user. }
   \item{b}{ Internal function not meant to be called by the user. }
-  \item{data}{ Internal function not meant to be called by the user. }
 }
 \details{
   Internal function not meant to be called by the user.

@@ -110,9 +110,9 @@ flowObj<-function(flowC=NULL,flowF=NULL){
   o;
 }
 
-mergeClusters2 <- function(object, a, b, data){
-    ly <- nrow(data)
-    py <- ncol(data)
+mergeClusters2 <- function(object, a, b){
+#    ly <- nrow(object@z)
+#    py <- ncol(data)
 
     
     # update mu, sigma, w
@@ -150,36 +150,73 @@ mergeClusters2 <- function(object, a, b, data){
     object@entropy <- -2*sum(object@z*log(object@z,base=2), na.rm=T)  
     object@ICL <- object@BIC + 2*sum(object@z*log(object@z),na.rm=T)
 
-    # update uncertainty -- now holds the penalized logLikelihood for the merged cluster -- Uncertainty is long to compute.. currently done outside in an external function, and not for each merged component, since only important for the one to be kept
-
-    ##This computes the sum of squared deviations between clusters. Some code to treat case of a single cluster.
-#    d<-dim(object@mu)[1]
-#    if(length(dim(object@sigma))==2){
-#        xx <- eigen(object@sigma);
-#        s<-solve(xx$vectors%*%sqrt(diag(xx$values))%*%t(xx$vectors));
-#    }else{
-#        s <- apply(object@sigma,1,function(x){xx<-eigen(x);list(solve(xx$vectors%*%sqrt(diag(xx$values))%*%t(xx$vectors)));});
-#    }
-#    m<-object@mu
-
     object
 }
 
+.computeDeltaE<-function(object,a,b){
+    list(a=a,b=b,e=-2*sum(object@z[,c(a,b)]*log(object@z[,c(a,b)]),na.rm=TRUE));
+}
 
-mergeClusters <- function(object, data) {
+.compMD<-function(object,a,b){
+    list(a=a,b=b,e=mahalanobis(object@mu[a,],object@mu[b,],object@sigma[b,,])+mahalanobis(object@mu[b,],object@mu[a,],object@sigma[a,,]))
+}
+
+.combFunc1<-function(x,y){
+    list(x,y)[[which.max(c(x$e,y$e))]]
+}
+.combFunc2<-function(x,y){
+    list(x,y)[[which.min(c(x$e,y$e))]]
+}
+
+mergeClusters <- function(object,metric="entropy") {
     K <- object@K
     minEnt <- Inf
     maxPLL<- -Inf
-    for (a in 1:(K-1)) for (b in (a+1):K) {
-        tempObject <- mergeClusters2(object, a, b, data)
-        if (tempObject@entropy < minEnt) {
-            minEnt <- tempObject@entropy
-            tempObject@merged<-unlist(lapply(list(Map(object)),function(x)length(which(x==a|x==b))))
-#            tempObject@merged <- c(tempObject@merged,list(a,b))
-            resObject <- tempObject
-        }
+	a<-0;
+	b<-0;
+    if(require(doMC)){
+        registerDoMC();
+    }else if(require(doSNOW)){
+        registerDoSNOW()
     }
+    if(grep("doSNOW",loadedNamespaces())!=0||grep("doMC",loadedNamespaces())!=0){
+    if(metric=="entropy"){
+    resObject<-foreach (a = 1:(K-1),.combine=.combFunc1, .options.multicore=list(preschedule=TRUE))%dopar%{ 
+     foreach (b = (a+1):K,.combine=.combFunc1,.options.multicore = list(preschedule=TRUE)) %dopar%{
+        .computeDeltaE(object,a,b);
+      }
+        
+#        tempObject <- mergeClusters2(object, a, b, data)
+#        if (tempObject@entropy < minEnt) {
+#            minEnt <- tempObject@entropy
+#            tempObject@merged<-unlist(lapply(list(Map(object)),function(x)length(which(x==a|x==b))))
+#            tempObject@merged <- c(tempObject@merged,list(a,b))
+#            resObject <- tempObject
+#        }
+      }
+    }else if(metric=="mahalanobis"){
+        resObject<-foreach (a = 1:(K-1),.combine=.combFunc2, .options.multicore=list(preschedule=TRUE))%dopar%{ 
+     foreach (b = (a+1):K,.combine=.combFunc2,.options.multicore = list(preschedule=TRUE)) %dopar%{
+         .compMD(object,a,b);
+        }
+      }
+    }    
     resObject
+}else{
+    if(metric=="entropy"){
+    resObject<-foreach (a = 1:(K-1),.combine=.combFunc1, .options.multicore=list(preschedule=TRUE))%do%{ 
+     foreach (b = (a+1):K,.combine=.combFunc1,.options.multicore = list(preschedule=TRUE)) %do%{
+        .computeDeltaE(object,a,b);
+      }
+    }
+    }else if(metric=="mahalanobis"){
+        resObject<-foreach (a = 1:(K-1),.combine=.combFunc2, .options.multicore=list(preschedule=TRUE))%do%{ 
+     foreach (b = (a+1):K,.combine=.combFunc2,.options.multicore = list(preschedule=TRUE)) %do%{
+         .compMD(object,a,b);
+        }
+      }
+    }    
+}
 }
 
 BIC <- function(x)as.numeric(unlist(lapply(x,function(q)try(q@BIC,silent=TRUE))))

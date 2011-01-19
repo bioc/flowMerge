@@ -6,12 +6,12 @@
   Internal cluster merging function.
 }
 \usage{
-mergeClusters(object, data)
+mergeClusters(object, metric)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{object}{ not meant to be called by the user }
-  \item{data}{ not meant to be called by the user }
+  \item{metric}{ not meant to be called by the user }
 }
 \details{
   Not meant to be called by the user
