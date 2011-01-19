@@ -52,7 +52,7 @@ library(multicore)
 <<stage1, echo=TRUE>>=
 data(rituximab)
 summary(rituximab)
-flowClust.res <- flowClust(rituximab, varNames=c(colnames(rituximab)[1:2]), K=1:5);
+flowClust.res <- flowClust(rituximab, varNames=c(colnames(rituximab)[1:2]), K=1:5,trans=1);
 @
 flowClust.res is a \texttt{flowClust} object containing the 5 cluster solution. We extract the BIC of each solution with the internal \texttt{flowMerge} function \texttt{BIC}:
 
@@ -65,7 +65,7 @@ Here we have extracted the max BIC solution, found for K=4. Before we run the cl
 
 <<stage3,echo=T,fig=TRUE>>=
 flowClust.flowobj<-flowObj(flowClust.maxBIC,rituximab);
-flowClust.merge<-merge(flowClust.flowobj);
+flowClust.merge<-merge(flowClust.flowobj,metric="entropy");
 i<-fitPiecewiseLinreg(flowClust.merge,plot=T);
 @
 Next we extract the merged solution with number of clusters equal to the position of the changepoint found by \texttt{fitPiecewiseLinreg}. This is the optimal merged solution based on the entropy criterion. The solution can be plotted with the \texttt{plot} method.
@@ -74,11 +74,11 @@ par(mfrow=c(2,2));
 flowClust.mergeopt<-flowClust.merge[[i]];
 plot(flowClust.res[[4]],data=rituximab,main="Max BIC solution");
 plot(flowClust.res[[which.max(flowMerge:::ICL(flowClust.res))]],data=rituximab,main="Max ICL solution");
-plot(flowClust.mergeopt,level=0.9,pch=20,main="Merged Solution");
+plot(flowClust.mergeopt,level=0.75,pch=20,main="Merged Solution");
 @
 We see that the merged solution provides a better fit to the lymphocyte population than either the max BIC solution, or the max ICL solution. Additionally, debris and granulocytes are also clearly identified, in contrast to the ICL solution. We can extract the lymphocyte population and re-run flowClust and flowMerge on the fluorescence channels of the lymphocytes only. 
 <<stage5,echo=T>>=
-pop<-which(apply(apply(getEstimates(flowClust.mergeopt)$locations,2,function(x)order(x)==2),1,all));
+pop<-which(apply(apply(getEstimates(flowClust.mergeopt)$locations,2,function(x)order(x,decreasing=TRUE)==2),1,all));
 lymphocytes<-split(getData(flowClust.mergeopt),flowClust.mergeopt,population=list("lymphocytes"=pop))$lymphocytes;
 lymphocytes<-lymphocytes[,c(3,5)];
 l.flowC<-flowClust(lymphocytes,varNames=c("FL1.H","FL3.H"),K=1:8,B=1000,B.init=100,tol=1e-5,tol.init=1e-2,randomStart=50,nu=4,nu.est=1,trans=1);
