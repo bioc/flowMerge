@@ -112,8 +112,9 @@ flowObj<-function(flowC=NULL,flowF=NULL){
 
 mergeClusters2 <- function(object, a, b){
 #    ly <- nrow(object@z)
-#    py <- ncol(data)
-
+    #py <- ncol(data)
+	py<-dim(object@mu)[1]
+	dy<-dim(object@mu)[2]
     
     # update mu, sigma, w
     P <- object@w[a]+object@w[b];
@@ -127,7 +128,12 @@ mergeClusters2 <- function(object, a, b){
     object@mu[a,]<-MU;
     dims<-dim(object@mu);
     object@z[,a] <- object@z[,a] + object@z[,b]
-    object@sigma[a,,]<-SIGMA; object@sigma<-object@sigma[-b,,];
+    object@sigma[a,,]<-SIGMA;
+	sigma<-object@sigma[-b,,];
+	if(!is.array(sigma)&dy==1){
+		#One dimensional case.. need to make this a proper array
+		object@sigma<-array(data=sigma,c(py-1,dy,dy))
+	}
     #if sigma is a single covariance matrix, then set it up into an appropriate array
     if(length(dim(object@sigma))==2){
         d<-dim(object@sigma);
@@ -135,10 +141,13 @@ mergeClusters2 <- function(object, a, b){
     }
     if(dims[1]==2){
       object@mu <- t(matrix(object@mu[-b,]));
-      object@z <- matrix(object@z[,-b]);
-    }else{
+	  object@z <- matrix(object@z[,-b]);
+    }else if(dims[2]==1){
+		object@mu<-matrix(object@mu[-b,])
+		object@z <- object@z[,-b];
+	}else {
       object@mu<-object@mu[-b,];
-      object@z <- object@z[,-b]
+      object@z <- object@z[,-b];
     }
   
     
@@ -149,8 +158,7 @@ mergeClusters2 <- function(object, a, b){
     
     object@entropy <- -2*sum(object@z*log(object@z,base=2), na.rm=T)  
     object@ICL <- object@BIC + 2*sum(object@z*log(object@z),na.rm=T)
-
-    object
+    return(object)
 }
 
 .computeDeltaE<-function(object,a,b){

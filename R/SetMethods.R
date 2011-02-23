@@ -8,7 +8,9 @@ setMethod("merge",signature=signature(x="flowObj",y="missing"),function(x,metric
   resultObject[[k]] <- as(x,"flowMerge");
   resultObject[[k]]@entropy <- -2*sum(resultObject[[k]]@z*log(resultObject[[k]]@z,base=2), na.rm=T)
   d <- dim(resultObject[[k]]@mu)[1];
-  s <- apply(resultObject[[k]]@sigma,1,function(x){xx<-eigen(x);list(solve(xx$vectors%*%sqrt(diag(xx$values))%*%t(xx$vectors),LINPACK=TRUE));});
+  ncl<-dim(resultObject[[k]]@mu)[2]
+
+  s <- apply(resultObject[[k]]@sigma,1,function(x){xx<-eigen(x);list(solve(xx$vectors%*%sqrt(diag(xx$values,ncl,ncl))%*%t(xx$vectors),LINPACK=TRUE));});
   #resultObject[[k]]@ssd<- 2*sum(sapply(1:d,function(i)sapply(1:d,function(j)sqrt(sum((s[[i]][[1]]%*%resultObject[[k]]@mu[i,]-s[[j]][[1]]%*%resultObject[[k]]@mu[j,])^2)))))
 
   if(k > 2){
@@ -33,7 +35,7 @@ setMethod("merge",signature=signature(x="flowObj",y="missing"),function(x,metric
   }
     message("Updating model statistics");
     for(i in 1:length(resultObject)){
-        resultObject[[i]]<-updateU(resultObject[[i]]);
+	    resultObject[[i]]<-updateU(resultObject[[i]]);
         resultObject[[i]]<-flagOutliers(resultObject[[i]]);
         ruleOutliers(resultObject[[i]])<-list(level=0.9);
         message("Updated model ",i);
