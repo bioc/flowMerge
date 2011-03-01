@@ -47,7 +47,7 @@ To demonstrate the functionality we use a flow cytometry data set from a drug-sc
 
 <<stage0, results=HIDE>>=
 library(flowMerge)
-library(multicore)
+require(multicore)
 @
 <<stage1, echo=TRUE>>=
 data(rituximab)
