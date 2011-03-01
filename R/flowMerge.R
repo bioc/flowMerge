@@ -187,44 +187,40 @@ mergeClusters <- function(object,metric="entropy") {
     }else if(require(doSNOW)){
         registerDoSNOW()
     }
-    if(grep("doSNOW",loadedNamespaces())!=0||grep("doMC",loadedNamespaces())!=0){
-    if(metric=="entropy"){
-    resObject<-foreach (a = 1:(K-1),.combine=.combFunc1, .options.multicore=list(preschedule=TRUE))%dopar%{ 
-     foreach (b = (a+1):K,.combine=.combFunc1,.options.multicore = list(preschedule=TRUE)) %dopar%{
-        .computeDeltaE(object,a,b);
-      }
+    if(any(grepl("doSNOW",loadedNamespaces()))|any(grepl("doMC",loadedNamespaces()))){
+    	if(metric=="entropy"){
+    		resObject<-foreach (a = 1:(K-1),.combine=.combFunc1, .options.multicore=list(preschedule=TRUE))%dopar%{ 
+     			foreach (b = (a+1):K,.combine=.combFunc1,.options.multicore = list(preschedule=TRUE)) %dopar%{
+      				.computeDeltaE(object,a,b);
+				}
         
-#        tempObject <- mergeClusters2(object, a, b, data)
-#        if (tempObject@entropy < minEnt) {
-#            minEnt <- tempObject@entropy
-#            tempObject@merged<-unlist(lapply(list(Map(object)),function(x)length(which(x==a|x==b))))
-#            tempObject@merged <- c(tempObject@merged,list(a,b))
-#            resObject <- tempObject
-#        }
-      }
-    }else if(metric=="mahalanobis"){
-        resObject<-foreach (a = 1:(K-1),.combine=.combFunc2, .options.multicore=list(preschedule=TRUE))%dopar%{ 
-     foreach (b = (a+1):K,.combine=.combFunc2,.options.multicore = list(preschedule=TRUE)) %dopar%{
-         .compMD(object,a,b);
-        }
-      }
-    }    
-    resObject
-}else{
-    if(metric=="entropy"){
-    resObject<-foreach (a = 1:(K-1),.combine=.combFunc1, .options.multicore=list(preschedule=TRUE))%do%{ 
-     foreach (b = (a+1):K,.combine=.combFunc1,.options.multicore = list(preschedule=TRUE)) %do%{
-        .computeDeltaE(object,a,b);
-      }
-    }
-    }else if(metric=="mahalanobis"){
-        resObject<-foreach (a = 1:(K-1),.combine=.combFunc2, .options.multicore=list(preschedule=TRUE))%do%{ 
-     foreach (b = (a+1):K,.combine=.combFunc2,.options.multicore = list(preschedule=TRUE)) %do%{
-         .compMD(object,a,b);
-        }
-      }
-    }    
-}
+    		}
+		}
+		else if(metric=="mahalanobis"){
+        	resObject<-foreach (a = 1:(K-1),.combine=.combFunc2, .options.multicore=list(preschedule=TRUE))%dopar%{ 
+     			foreach (b = (a+1):K,.combine=.combFunc2,.options.multicore = list(preschedule=TRUE)) %dopar%{
+         			.compMD(object,a,b);
+        		}
+      		}
+    	}    
+		resObject
+	}
+	else{
+    	if(metric=="entropy"){
+    		resObject<-foreach (a = 1:(K-1),.combine=.combFunc1, .options.multicore=list(preschedule=TRUE))%do%{ 
+     			foreach (b = (a+1):K,.combine=.combFunc1,.options.multicore = list(preschedule=TRUE)) %do%{
+        			.computeDeltaE(object,a,b);
+      			}
+    		}
+		}
+		else if(metric=="mahalanobis"){
+        	resObject<-foreach (a = 1:(K-1),.combine=.combFunc2, .options.multicore=list(preschedule=TRUE))%do%{ 
+     			foreach (b = (a+1):K,.combine=.combFunc2,.options.multicore = list(preschedule=TRUE)) %do%{
+         			.compMD(object,a,b);
+        		}
+      		}
+    	}    
+	}
 }
 
 BIC <- function(x)as.numeric(unlist(lapply(x,function(q)try(q@BIC,silent=TRUE))))
