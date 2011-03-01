@@ -1,7 +1,7 @@
 Package: flowMerge
 Type: Package
 Title: Cluster Merging for Flow Cytometry Data 
-Version: 1.99.2
+Version: 1.99.3
 Date: 2011-01-19
 Author: Greg Finak <gfinak@fhcrc.org>, Raphael Gottardo <rgottard@fhcrc.org>
 Maintainer: Greg Finak <gfinak@fhcrc.org>
