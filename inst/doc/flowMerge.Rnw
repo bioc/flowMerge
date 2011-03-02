@@ -52,7 +52,7 @@ require(multicore)
 <<stage1, echo=TRUE>>=
 data(rituximab)
 summary(rituximab)
-flowClust.res <- flowClust(rituximab, varNames=c(colnames(rituximab)[1:2]), K=1:5,trans=1);
+flowClust.res <- flowClust(rituximab, varNames=c(colnames(rituximab)[1:2]), K=1:5,trans=1,nu.est=1);
 @
 flowClust.res is a \texttt{flowClust} object containing the 5 cluster solution. We extract the BIC of each solution with the internal \texttt{flowMerge} function \texttt{BIC}:
 

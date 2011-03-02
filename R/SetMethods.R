@@ -182,9 +182,11 @@ setMethod("fitPiecewiseLinreg",signature=signature(x="list"),{
             }        
         }else if(l==2){
             warning("Two clusters.. no changepoint possible. Returning fully merged solution");
-            return(1);
+            frame();	
+			return(1);
         }else if(l==3)
         {
+		frame();
             if(normalized){
                 r2<-sum(lm(entropy~N)$residuals^2);
                 r<-sapply(2:(l-1),function(b) try(list(lm(entropy~N,subset=c(1:b)), lm(entropy~I(1:l),subset=c(b:l)))));
@@ -203,6 +205,7 @@ setMethod("fitPiecewiseLinreg",signature=signature(x="list"),{
                 return(3);            
             }
         }else if(l==1){
+		frame();
          return(1);   
         }
     }
