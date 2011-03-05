@@ -37,7 +37,7 @@ pFlowMerge(flowData, cl, K = 1:15, B.init = 100, tol.init = 0.01, tol = 1e-05, B
   \link{pFlowClust},\link[flowClust]{flowClust},\link{merge},\pkg{snow},
   \link{fitPiecewiseLinreg}}  
 \examples{
-library(multicore)
+require(multicore)
 data(rituximab)
 #Parallelized call below:
 \dontrun{cl<-makeSOCKcluster(rep("finakg@localhost",7))}

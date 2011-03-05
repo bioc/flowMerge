@@ -182,10 +182,12 @@ mergeClusters <- function(object,metric="entropy") {
     maxPLL<- -Inf
 	a<-0;
 	b<-0;
-    if(require(doMC)){
-        registerDoMC();
-    }else if(require(doSNOW)){
-        registerDoSNOW()
+    if(!is.na(match("doMC",installed.packages()))){
+		require(doMC)
+        doMC::registerDoMC();
+    }else if(!is.na(match("doSNOW",installed.packages()))){
+		require(doSNOW)
+        doSNOW::registerDoSNOW()
     }
     if(any(grepl("doSNOW",loadedNamespaces()))|any(grepl("doMC",loadedNamespaces()))){
     	if(metric=="entropy"){
