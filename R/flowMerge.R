@@ -185,11 +185,13 @@ mergeClusters <- function(object,metric="entropy") {
     if(!is.na(match("doMC",installed.packages()))){
 		require(doMC)
         doMC::registerDoMC();
-    }else if(!is.na(match("doSNOW",installed.packages()))){
-		require(doSNOW)
-        doSNOW::registerDoSNOW()
     }
-    if(any(grepl("doSNOW",loadedNamespaces()))|any(grepl("doMC",loadedNamespaces()))){
+# else if(!is.na(match("doSNOW",installed.packages()))){
+# 		require(doSNOW)
+#         doSNOW::registerDoSNOW()
+#     }
+    # if(any(grepl("doSNOW",loadedNamespaces()))|any(grepl("doMC",loadedNamespaces()))){
+	  if(any(grepl("doMC",loadedNamespaces()))){
     	if(metric=="entropy"){
     		resObject<-foreach (a = 1:(K-1),.combine=.combFunc1, .options.multicore=list(preschedule=TRUE))%dopar%{ 
      			foreach (b = (a+1):K,.combine=.combFunc1,.options.multicore = list(preschedule=TRUE)) %dopar%{
