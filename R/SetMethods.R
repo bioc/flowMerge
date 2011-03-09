@@ -88,7 +88,7 @@ setMethod("updateU", signature = signature(object = "flowMerge"), function(objec
 #    object@u<-u;
 #     }
 #  }
-  object@label <- map(object@z);
+  object@label <- Map(object);
   object;
 })
 
@@ -226,13 +226,16 @@ function(object,...){
 setGeneric("flagOutliers",function(object,...){standardGeneric("flagOutliers")});
 setMethod("flagOutliers",signature=signature("flowMerge"),
 function(object,...){
-    if(object@ruleOutliers[1]==0){        
+    if(object@ruleOutliers[1]==0){  
+	      qq<-qf(object@ruleOutliers[2],length(object@varNames),object@nu)
+		  qq<-(object@nu+length(object@varNames))/(object@nu+length(object@varNames)*qq)
         object@flagOutliers<-sapply(1:nrow(object@u),function(i){
-        object@u[i,object@label[i]]<object@ruleOutliers[2]||object@z[i,object@label[i]]<object@ruleOutliers[3]})
+        object@u[i,object@label[i]]<qq||object@z[i,object@label[i]]<object@ruleOutliers[3]})
     }else if(object@ruleOutliers[1]==1){
         object@flagOutliers<-sapply(1:nrow(object@u),function(i){
-        object@flagOutliers<-object@z[i,object@label[i]]<object@ruleOutliers[3]})
-    }
+        object@flagOutliers<-object@u[i,object@label[i]]<object@ruleOutliers[2]||object@z[i,object@label[i]]<object@ruleOutliers[3]
+	})
+}
     object;
 })
 
