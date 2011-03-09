@@ -111,8 +111,6 @@ flowObj<-function(flowC=NULL,flowF=NULL){
 }
 
 mergeClusters2 <- function(object, a, b){
-#    ly <- nrow(object@z)
-    #py <- ncol(data)
 	py<-dim(object@mu)[1]
 	dy<-dim(object@mu)[2]
     
@@ -186,11 +184,6 @@ mergeClusters <- function(object,metric="entropy") {
 		require(doMC)
         doMC::registerDoMC();
     }
-# else if(!is.na(match("doSNOW",installed.packages()))){
-# 		require(doSNOW)
-#         doSNOW::registerDoSNOW()
-#     }
-    # if(any(grepl("doSNOW",loadedNamespaces()))|any(grepl("doMC",loadedNamespaces()))){
 	  if(any(grepl("doMC",loadedNamespaces()))){
     	if(metric=="entropy"){
     		resObject<-foreach (a = 1:(K-1),.combine=.combFunc1, .options.multicore=list(preschedule=TRUE))%dopar%{ 

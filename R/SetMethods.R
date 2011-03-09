@@ -35,7 +35,7 @@ setMethod("merge",signature=signature(x="flowObj",y="missing"),function(x,metric
   }
     message("Updating model statistics");
     for(i in 1:length(resultObject)){
-	    #resultObject[[i]]<-updateU(resultObject[[i]]);
+	    resultObject[[i]]<-updateU(resultObject[[i]]);
         #resultObject[[i]]<-flagOutliers(resultObject[[i]]);
         ruleOutliers(resultObject[[i]])<-list(x@ruleOutliers)
         message("Updated model ",i);
@@ -52,10 +52,17 @@ setMethod("split",signature=signature(x="missing",f="flowMerge"),function(f, dro
 
 .computeU<-function(res,data){
     u<-matrix(0,dim(res@z)[1],res@K);
+	if(any(res@lambda!=1)){
     for(i in (1:res@K)){
-    u[,i]<-(res@nu+dim(res@mu)[2])/(res@nu+dmvt((data),res@mu[i,],res@sigma[i,,],res@nu,res@lambda)$md);
+    u[,i]<-(res@nu+dim(res@mu)[2])/(res@nu+dmvt((data),res@mu[i,],res@sigma[i,,],res@nu,lambda=res@lambda)$md);
     #message("Updated cluster ",i);
     }
+	}else{
+		for(i in (1:res@K)){
+	    u[,i]<-(res@nu+dim(res@mu)[2])/(res@nu+dmvt((data),res@mu[i,],res@sigma[i,,],res@nu)$md);
+	    #message("Updated cluster ",i);
+	    }
+	}	
     u;
    }
 
