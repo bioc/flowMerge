@@ -37,7 +37,7 @@ setMethod("merge",signature=signature(x="flowObj",y="missing"),function(x,metric
     for(i in 1:length(resultObject)){
 	    resultObject[[i]]<-updateU(resultObject[[i]]);
         resultObject[[i]]<-flagOutliers(resultObject[[i]]);
-        ruleOutliers(resultObject[[i]])<-list(level=0.9);
+        ruleOutliers(resultObject[[i]])<-list(x@ruleOutliers)
         message("Updated model ",i);
     }
 #    resultObject <- lapply(resultObject, updateU);
