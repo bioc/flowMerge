@@ -47,7 +47,7 @@ setMethod("merge",signature=signature(x="flowObj",y="missing"),function(x,metric
 })
 
 setMethod("split",signature=signature(x="flowMerge",f="missing"),function(x,f, drop = FALSE, population=NULL,split = NULL, rm.outliers = TRUE, ...){
-    split( x = getData(f),f = as(f, "flowClust"), population=population, split = split, rm.outliers = rm.outliers, ...);
+    split( x = getData(x),f = as(x, "flowClust"), population=population, split = split, rm.outliers = rm.outliers, ...);
 });
 
 .computeU<-function(res,data){
