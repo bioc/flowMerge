@@ -79,7 +79,7 @@ plot(flowClust.mergeopt,level=0.75,pch=20,main="Merged Solution");
 We see that the merged solution provides a better fit to the lymphocyte population than either the max BIC solution, or the max ICL solution. Additionally, debris and granulocytes are also clearly identified, in contrast to the ICL solution. We can extract the lymphocyte population and re-run flowClust and flowMerge on the fluorescence channels of the lymphocytes only. 
 <<stage5,echo=T>>=
 pop<-which(apply(apply(getEstimates(flowClust.mergeopt)$locations,2,function(x)order(x,decreasing=TRUE)==2),1,all));
-lymphocytes<-split(getData(flowClust.mergeopt),flowClust.mergeopt,population=list("lymphocytes"=pop))$lymphocytes;
+lymphocytes<-split(flowClust.mergeopt,population=list("lymphocytes"=pop))$lymphocytes;
 lymphocytes<-lymphocytes[,c(3,5)];
 l.flowC<-flowClust(lymphocytes,varNames=c("FL1.H","FL3.H"),K=1:8,B=1000,B.init=100,tol=1e-5,tol.init=1e-2,randomStart=50,nu=4,nu.est=1,trans=1);
 @
