@@ -160,7 +160,7 @@ mergeClusters2 <- function(object, a, b){
 }
 
 .computeDeltaE<-function(object,a,b){
-    list(a=a,b=b,e=-2*sum(object@z[,c(a,b)]*log(object@z[,c(a,b)]),na.rm=TRUE));
+	list(a=a,b=b,e=-2*sum(object@z[,c(a,b)]*log(object@z[,c(a,b)]),na.rm=T)+2*sum(rowSums(object@z[,c(a,b)])*log(rowSums(object@z[,c(a,b)])),na.rm=T));
 }
 
 .compMD<-function(object,a,b){
