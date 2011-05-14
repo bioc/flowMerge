@@ -133,10 +133,12 @@ mergeClusters2 <- function(object, a, b){
 		object@sigma<-array(data=sigma,c(py-1,dy,dy))
 	}
     #if sigma is a single covariance matrix, then set it up into an appropriate array
-    if(length(dim(object@sigma))==2){
+    if(length(dim(sigma))==2){
         d<-dim(object@sigma);
         object@sigma<-array(object@sigma,dim=c(1,d[1],d[2]));
-    }
+    }else{
+		object@sigma<-sigma
+	}
     if(dims[1]==2){
       object@mu <- t(matrix(object@mu[-b,]));
 	  object@z <- matrix(object@z[,-b]);
