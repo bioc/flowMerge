@@ -110,10 +110,22 @@ flowObj<-function(flowC=NULL,flowF=NULL){
   o;
 }
 
+
 mergeClusters2 <- function(object, a, b){
 	py<-dim(object@mu)[1]
 	dy<-dim(object@mu)[2]
-    
+    #popnames to merge
+	pnames<-rownames(object@mu)[c(a,b)]
+	mpname<-paste(pnames,collapse=":");
+	#fix rownames
+	rn<-rownames(object@mu)
+	rn[a]<-mpname
+	rownames(object@mu)<-rn
+	#update the tree
+	object@mtree<-graph::addNode(mpname,object@mtree);
+	object@mtree<-graph::addEdge(mpname,pnames[1],object@mtree)
+	object@mtree<-graph::addEdge(mpname,pnames[2],object@mtree)
+	
     # update mu, sigma, w
     P <- object@w[a]+object@w[b];
     MU<-(object@w[a]*object@mu[a,]+object@w[b]*object@mu[b,])/P
@@ -127,7 +139,7 @@ mergeClusters2 <- function(object, a, b){
     dims<-dim(object@mu);
     object@z[,a] <- object@z[,a] + object@z[,b]
     object@sigma[a,,]<-SIGMA;
-	sigma<-object@sigma[-b,,];
+	sigma<-object@sigma[-b,,,drop=FALSE];
 	if(!is.array(sigma)&dy==1){
 		#One dimensional case.. need to make this a proper array
 		object@sigma<-array(data=sigma,c(py-1,dy,dy))
@@ -140,13 +152,14 @@ mergeClusters2 <- function(object, a, b){
 	object@sigma<-sigma
 	}
     if(dims[1]==2){
-      object@mu <- t(matrix(object@mu[-b,]));
+	#Removed the t(), added drop=FALSE. Cleaner
+      object@mu <- ((object@mu[-b,,drop=FALSE]));
 	  object@z <- matrix(object@z[,-b]);
     }else if(dims[2]==1){
-		object@mu<-matrix(object@mu[-b,])
+		object@mu<-matrix(object@mu[-b,,drop=FALSE])
 		object@z <- object@z[,-b];
 	}else {
-      object@mu<-object@mu[-b,];
+      object@mu<-object@mu[-b,,drop=FALSE];
       object@z <- object@z[,-b];
     }
   
@@ -161,8 +174,8 @@ mergeClusters2 <- function(object, a, b){
     return(object)
 }
 
-.computeDeltaE<-function(object,a,b){
-	list(a=a,b=b,e=-2*sum(object@z[,c(a,b)]*log(object@z[,c(a,b)]),na.rm=T)+2*sum(rowSums(object@z[,c(a,b)])*log(rowSums(object@z[,c(a,b)])),na.rm=T));
+.computeDeltaE<-function(z,a,b){
+	list(a=a,b=b,e=-2*sum(z[,c(a,b)]*log(z[,c(a,b)]),na.rm=T)+2*sum(rowSums(z[,c(a,b)])*log(rowSums(z[,c(a,b)])),na.rm=T));
 }
 
 .compMD<-function(object,a,b){
@@ -182,30 +195,29 @@ mergeClusters <- function(object,metric="entropy") {
     maxPLL<- -Inf
 	a<-0;
 	b<-0;
-    if(!is.na(match("doMC",installed.packages()))){
-		require(doMC)
+	if(length(grep("multicore",loadedNamespaces()))==1&require(doMC))
+	{
         doMC::registerDoMC();
-    }
-	  if(any(grepl("doMC",loadedNamespaces()))){
-    	if(metric=="entropy"){
-    		resObject<-foreach (a = 1:(K-1),.combine=.combFunc1, .options.multicore=list(preschedule=TRUE))%dopar%{ 
-     			foreach (b = (a+1):K,.combine=.combFunc1,.options.multicore = list(preschedule=TRUE)) %dopar%{
-      				.computeDeltaE(object,a,b);
-				}
-        
-    		}
+
+	if(metric=="entropy"){
+		resObject<-foreach (a = 1:(K-1),.combine=.combFunc1, .options.multicore=list(preschedule=TRUE))%dopar%{ 
+ 			foreach (b = (a+1):K,.combine=.combFunc1,.options.multicore = list(preschedule=TRUE)) %dopar%{
+  				.computeDeltaE(object@z,a,b);
+			}
+    
 		}
-		else if(metric=="mahalanobis"){
-        	resObject<-foreach (a = 1:(K-1),.combine=.combFunc2, .options.multicore=list(preschedule=TRUE))%dopar%{ 
-     			foreach (b = (a+1):K,.combine=.combFunc2,.options.multicore = list(preschedule=TRUE)) %dopar%{
-         			.compMD(object,a,b);
-        		}
-      		}
-    	}    
-		resObject
 	}
-	else{
-    	if(metric=="entropy"){
+	else if(metric=="mahalanobis"){
+    	resObject<-foreach (a = 1:(K-1),.combine=.combFunc2, .options.multicore=list(preschedule=TRUE))%dopar%{ 
+ 			foreach (b = (a+1):K,.combine=.combFunc2,.options.multicore = list(preschedule=TRUE)) %dopar%{
+     			.compMD(object,a,b);
+    		}
+  		}
+	}    
+	return(resObject)
+	} else
+	{
+		if(metric=="entropy"){
     		resObject<-foreach (a = 1:(K-1),.combine=.combFunc1, .options.multicore=list(preschedule=TRUE))%do%{ 
      			foreach (b = (a+1):K,.combine=.combFunc1,.options.multicore = list(preschedule=TRUE)) %do%{
         			.computeDeltaE(object,a,b);
@@ -219,6 +231,7 @@ mergeClusters <- function(object,metric="entropy") {
         		}
       		}
     	}    
+    return(resObject);	
 	}
 }
 
@@ -227,6 +240,63 @@ ICL <- function(x)as.numeric(unlist(lapply(x,function(q)try(q@ICL,silent=TRUE)))
 ENT <-function(x)as.numeric(unlist(lapply(x,function(q)try(q@entropy,silent=TRUE))))
 NENT<-function(x)as.numeric(unlist(lapply(x,function(q)try(q@entropy/(q@K*dim(q@z)[1]),silent=TRUE))))
 
+#x is the "name" of the merged list of models.
+#y is the index of the "best" merged model
+#Returns a function that will plot the merge tree, given the index of the parameter, and the complete merge tree at m[[1]]@mtree
+ptree<-function(x,y){
+  
+  lm<-length(get(x,.GlobalEnv));
+  popnames<-rownames(get(x,.GlobalEnv)[[y]]@mu)
+  mytree<-get(x,.GlobalEnv)[[1]]@mtree
+  
+colmeans<-NULL
+  for(i in 2:lm){
+    colmeans<-rbind(colmeans,get(x,.GlobalEnv)[[i]]@mu[,,drop=FALSE]);
+  }
+colmeans<-rbind(matrix(get(x,.GlobalEnv)[[1]]@mu,nrow=1),colmeans)
+rn<-rownames(colmeans);rn[1]<-paste(rownames(colmeans)[2:3],collapse=":");rownames(colmeans)<-rn;
+
+colors<-apply(colmeans,2,function(x){
+rgb(red=x/max(x),blue=0.5,green=0.5,alpha=0.9)
+})
+rownames(colors)<-rownames(colmeans)
+colnames(colors)<-as.vector(parameters(get(x,.GlobalEnv)[[1]]@DATA[["1"]])@data$desc[which(colnames(get(x,.GlobalEnv)[[1]]@DATA[["1"]])%in%get(x,.GlobalEnv)[[1]]@varNames)])
+#top nodes
+a<-rownames(unique(do.call(rbind,lapply(get(x,.GlobalEnv)[1:(y-1)],function(x)x@mu[,,drop=FALSE]))))
+b<-rownames(unique(do.call(rbind,lapply(get(x,.GlobalEnv)[y:lm],function(x)x@mu[,,drop=FALSE]))))
+topnodes<-(setdiff(a,b))
+b<-rownames(unique(do.call(rbind,lapply(get(x,.GlobalEnv)[(y+1):lm],function(x)x@mu[,,drop=FALSE]))))
+a<-rownames(unique(do.call(rbind,lapply(get(x,.GlobalEnv)[1:y],function(x)x@mu[,,drop=FALSE]))))
+ttopnodes<-c(intersect(a,b),setdiff(a,b))
+
+
+#Set dashed lines for nodes below flowMerge model nodes
+nlty<-rep(1,length(nodes(mytree)))
+names(nlty)<-nodes(mytree)
+nlty[which(!names(nlty)%in%c(popnames,topnodes))]<-2
+
+#set thick lines for flowMerge model nodes
+nlwd<-rep(1,length(nodes(mytree)))
+names(nlwd)<-nodes(mytree)
+nlwd[which(names(nlwd)%in%c(popnames))]<-2
+
+shp<-rep("circle",length(nodes(mytree)))
+names(shp)<-nodes(mytree)
+shp[which(names(shp)%in%c(popnames))]<-"ellipse"
+shp[which(names(shp)%in%c(topnodes))]<-"rectangle"
+#Returns a function that plots this tree
+function(i,T=get(x,.GlobalEnv)[[1]]@mtree){
+T<-subGraph(ttopnodes,T)
+nodeRenderInfo(T)<-list(lty=nlty)
+nodeRenderInfo(T)<-list(shape=shp)
+nodeRenderInfo(T)<-list(lwd=nlwd)
+nodeRenderInfo(T)<-list(label="")
+nodeRenderInfo(T)<-list(fill=(colors[,i]))
+#plot(igraph.from.graphNEL(T),layout=layout.reingold.tilford)
+T<-layoutGraph(T,layoutType="dot",attrs=list(graph=list(rankdir="TB",main=colnames(colors)[i],rank="source",page=c(8.5,11))))
+renderGraph(T)
+}
+}
 
 
 

@@ -1,10 +1,12 @@
-export(fitPiecewiseLinreg,pFlowMerge,checkForRemoteErrors,flowObj,ENT,NENT,BIC,ICL,split,map);
+export(fitPiecewiseLinreg,pFlowMerge,checkForRemoteErrors,flowObj,ENT,NENT,BIC,ICL,split,map,ptree);
 import(flowClust);
 import(flowCore);
 import(methods);
-
+importClassesFrom( graph, graphNEL);
 importMethodsFrom(rrcov,getData);
+importMethodsFrom(Rgraphviz,renderGraph)
 importFrom(graphics, lines, par, plot);
+importFrom(Rgraphviz,layoutGraph)
 importFrom(stats, coefficients, lm);
 importFrom(utils,combn);
 

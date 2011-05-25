@@ -90,7 +90,7 @@ l.flowO<-flowObj(l.flowC[[which.max(flowMerge:::BIC(l.flowC))]],lymphocytes);
 plot(l.flowO,main="max BIC solution",new.window=F,pch=20,level=0.9);
 plot(flowObj(l.flowC[[which.max(flowMerge:::ICL(l.flowC))]],lymphocytes),main="max ICL solution",new.window=F,pch=20,level=0.9);
 l.flowM<-merge(l.flowO);
-i<-fitPiecewiseLinreg(l.flowM,plot=F);
+i<-fitPiecewiseLinreg(l.flowM,plot=T);
 plot(l.flowM[[i]],new.window=F,main="Best Merged Solution",pch=20,level=0.9);
 @
 We complete the analysis by choosing the best fitting merged solution and comparing it to the max BIC and max ICL solutions.
@@ -101,6 +101,19 @@ The resulting models are evaluated for the max BIC solutions for each \texttt{fl
 
 \subsection{Recent updates}
 The flowMerge algorithm has been updated to increase speed and now supports parallelization when the \texttt{foreach} package is installed. FlowMerge now also supports merging on the mahalanobis distance metric as well as the entropy. These can be specified to the merging algorithm via the optional \texttt{metric}  argument \texttt{(metric=c("entropy","mahalanobis")} to the \texttt{merge()} function. The default is to use "entropy".
+
+
+We have added some new features for plotting the tree of merged populations, and highlighting the nodes/populations according to marker expression. For the fluorescent markers above:
+
+<<stage7,echo=TRUE,fig=T>>=
+require(Rgraphviz)
+f<-ptree("l.flowM",fitPiecewiseLinreg(l.flowM));
+par(mfrow=c(1,2))
+f(1);
+f(2);
+@
+
+Circular nodes with dashed borders show merged clusters. Elliptical nodes show the chosen populations in the best fitting model. Square nodes show the rest of the complete merging to a single cluster. Red indicated higher expression of the marker, and blue/green shows lower expression. Note that it is normalized between 0 and 1 on the range of the data. 
 
 \subsection{Upcoming improvements}
 FlowMerge is undergoing continuous usability improvements, specifically with respect to the parallel computation framework. Figures of merit and other statistics will be output to allow the user to monitor the success or failure of the merging algorithm as it works through a large data set. A framework for semi--supervised selection of lymphocyte populations across multiple samples is also in the works. pFlowMerge does not do any sophisticated memory management, as such if you have a large data set, we suggest feeding it to pFlowMerge piece by piece, depending on the amount of RAM available to your machine / cluster.

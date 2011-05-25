@@ -9,7 +9,12 @@ setMethod("merge",signature=signature(x="flowObj",y="missing"),function(x,metric
   resultObject[[k]]@entropy <- -2*sum(resultObject[[k]]@z*log(resultObject[[k]]@z,base=2), na.rm=T)
   d <- dim(resultObject[[k]]@mu)[1];
   ncl<-dim(resultObject[[k]]@mu)[2]
-
+  for(n in 1:d){
+	resultObject[[k]]@mtree<-graph::addNode(as.character(n),resultObject[[k]]@mtree)
+  }
+	#set the population names for the initial BIC clustering
+	rownames(resultObject[[k]]@mu)<-as.character(1:d)
+	
   s <- apply(resultObject[[k]]@sigma,1,function(x){xx<-eigen(x);list(solve(xx$vectors%*%sqrt(diag(xx$values,ncl,ncl))%*%t(xx$vectors),LINPACK=TRUE));});
   #resultObject[[k]]@ssd<- 2*sum(sapply(1:d,function(i)sapply(1:d,function(j)sqrt(sum((s[[i]][[1]]%*%resultObject[[k]]@mu[i,]-s[[j]][[1]]%*%resultObject[[k]]@mu[j,])^2)))))
 
@@ -19,7 +24,6 @@ setMethod("merge",signature=signature(x="flowObj",y="missing"),function(x,metric
         resultObject[[kk]]<-mergeClusters2(resultObject[[kk+1]],tmp[[1]],tmp[[2]])
         resultObject[[kk]]@merged<-unlist(lapply(list(Map(resultObject[[kk]])),function(x)length(which(x==tmp[[1]]))))
         #resultObject@merged <- c(resultObject[[kk+1]]@merged,list(tmp[[1]],tmp[[2]]))
-
         message("Merged to ",kk," clusters");
     }
     tmp<- mergeClusters(resultObject[[2]],metric=metric)
@@ -140,6 +144,7 @@ setMethod("fitPiecewiseLinreg",signature=signature(x="list"),{
         if(!all(unlist(lapply(x,function(y)is(y,"flowMerge"))))){
             stop("x is not a valid list of flowMerge objects");        
         }
+		#@merged slot holds the number of events merged at that point
         entropy<-flowMerge:::ENT(x);
         N<-(unlist(lapply(x,function(y)y@merged)))
         N<-cumsum(c(0,N[-length(N)]))

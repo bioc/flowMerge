@@ -12,7 +12,8 @@ The object unites the flowMerge model output and the data being modeled and cont
 }
 \section{Slots}{
 	 \describe{
-    \item{\code{merged}:}{A list containing the cluster numbers merged at each iteration of the flowMerge algorithm, in order to arrive at the current solution  }
+    \item{\code{merged}:}{The number of observations merged at the current step in the algorithm.}
+	\item{\code{mtree}:}{A tree--structured graph representing the order of merged components in the model. Inspired by SPADE. (Bendall et al.)}
     \item{\code{entropy}:}{The entropy of clustering of the current solution.  }
     \item{\code{DATA}:}{An environment whose first element contains the flowFrame with the data modeled by this flowMerge object  }
     \item{\code{expName}:}{See the \code{flowClust} package for details  }
