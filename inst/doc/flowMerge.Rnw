@@ -45,7 +45,7 @@ We apply a cluster merging approach to perform automated gating of cell populati
 
 To demonstrate the functionality we use a flow cytometry data set from a drug-screening project to identify agents that would enhance the anti-lymphoma activity of Rituximab, a therapeutic monoclonal antibody.  The data set is an object of class \texttt{flowFrame}; it consists of eight variables, among them only the two scattering variables (\texttt{FSC.H}, \texttt{SSC.H}) and two channels for the fluorochrome measurements (\texttt{FL1.H}, \texttt{FL3.H})  are of interest in this experiment.  The flowMerge package may be invoked upon the output of a call to flowClust, or it may be invoked on a \texttt{flowFrame} directly via the parallelized method \texttt{pFlowMerge}, which will itself call \texttt{flowClust} but throw away intermediate results. The following code will model one through 10 clusters using flowClust in a parallel manner using \texttt{snow}, choose the best BIC solution, merge clusters in the best BIC solution, choose the best merged solution based on the entropy criterion, then plot the results. This functionality is wrapped in the \texttt{pFlowMerge} function, with additional parallelization using \texttt{snow}. Additionally, if the snow cluster object passed to pFlowMerge is null, the non-parallel version of flowMerge is called.
 
-<<stage0, results=HIDE>>=
+<<stage0, results=hide>>=
 library(flowMerge)
 require(multicore)
 @
