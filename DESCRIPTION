@@ -1,8 +1,8 @@
 Package: flowMerge
 Type: Package
 Title: Cluster Merging for Flow Cytometry Data 
-Version: 2.1.4
-Date: 2011-03-11
+Version: 2.1.5
+Date: 2011-05-26
 Author: Greg Finak <gfinak@fhcrc.org>, Raphael Gottardo <rgottard@fhcrc.org>
 Maintainer: Greg Finak <gfinak@fhcrc.org>
 Description: Merging of mixture components for model-based automated gating of flow cytometry data using the flowClust framework. Note: users should have a working copy of flowClust 2.0 installed.
