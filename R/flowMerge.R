@@ -247,7 +247,6 @@ ptree<-function(x,y){
   lm<-length(get(x,.GlobalEnv));
   popnames<-rownames(get(x,.GlobalEnv)[[y]]@mu)
   mytree<-get(x,.GlobalEnv)[[1]]@mtree
-  
 colmeans<-NULL
   for(i in 2:lm){
     colmeans<-rbind(colmeans,get(x,.GlobalEnv)[[i]]@mu[,,drop=FALSE]);
@@ -264,10 +263,15 @@ colnames(colors)<-as.vector(parameters(get(x,.GlobalEnv)[[1]]@DATA[["1"]])@data$
 a<-rownames(unique(do.call(rbind,lapply(get(x,.GlobalEnv)[1:(y-1)],function(x)x@mu[,,drop=FALSE]))))
 b<-rownames(unique(do.call(rbind,lapply(get(x,.GlobalEnv)[y:lm],function(x)x@mu[,,drop=FALSE]))))
 topnodes<-(setdiff(a,b))
+if(y<lm){
 b<-rownames(unique(do.call(rbind,lapply(get(x,.GlobalEnv)[(y+1):lm],function(x)x@mu[,,drop=FALSE]))))
 a<-rownames(unique(do.call(rbind,lapply(get(x,.GlobalEnv)[1:y],function(x)x@mu[,,drop=FALSE]))))
 ttopnodes<-c(intersect(a,b),setdiff(a,b))
+}
+sg1<-subGraph(rownames(get(x,.GlobalEnv)[[y]]@mu),get(x,.GlobalEnv)[[1]]@mtree)
+sg2<-subGraph(rownames(get(x,.GlobalEnv)[[1]]@mu),get(x,.GlobalEnv)[[1]]@mtree)
 
+sgList<-list(list(graph=sg1),list(graph=sg2));
 
 #Set dashed lines for nodes below flowMerge model nodes
 nlty<-rep(1,length(nodes(mytree)))
@@ -283,17 +287,35 @@ shp<-rep("circle",length(nodes(mytree)))
 names(shp)<-nodes(mytree)
 shp[which(names(shp)%in%c(popnames))]<-"ellipse"
 shp[which(names(shp)%in%c(topnodes))]<-"rectangle"
+
 #Returns a function that plots this tree
 function(i,T=get(x,.GlobalEnv)[[1]]@mtree){
-T<-subGraph(ttopnodes,T)
+lm<-length(get(x,.GlobalEnv))
+nodeDataDefaults(T,"MFI")<-NA
+  nodeDataDefaults(T,"p")<-NA
+  mfi<-unique(do.call(rbind,sapply(1:lm,function(i){get(x,.GlobalEnv)[[i]]@mu[,,drop=FALSE]})))
+  colnames(mfi)<-as.vector(parameters(get(x,.GlobalEnv)[[1]]@DATA[["1"]])@data$desc[which(colnames(get(x,.GlobalEnv)[[1]]@DATA[["1"]])%in%get(x,.GlobalEnv)[[1]]@varNames)])
+  p<-unique(do.call(c,sapply(1:lm,function(i){get(x,.GlobalEnv)[[i]]@w})))
+  names(p)<-rownames(mfi)
+  #Assign mfi and p to the nodes of the graph
+  for(j in 1:nrow(mfi)){
+	nodeData(T,rownames(mfi)[j],"MFI")<-list(mfi[j,,drop=FALSE])
+	nodeData(T,rownames(mfi)[j],"p")<-list(p[j])
+  }
+if(exists("ttopnodes")){
+	T<-subGraph(ttopnodes,T)
+}  
+
 nodeRenderInfo(T)<-list(lty=nlty)
 nodeRenderInfo(T)<-list(shape=shp)
 nodeRenderInfo(T)<-list(lwd=nlwd)
 nodeRenderInfo(T)<-list(label="")
 nodeRenderInfo(T)<-list(fill=(colors[,i]))
-#plot(igraph.from.graphNEL(T),layout=layout.reingold.tilford)
-T<-layoutGraph(T,layoutType="dot",attrs=list(graph=list(rankdir="TB",main=colnames(colors)[i],rank="source",page=c(8.5,11))))
+
+T<-layoutGraph(T,layoutType="dot",attrs=list(graph=list(rankdir="TB",main=colnames(colors)[i],rank="source",page=c(8.5,11))),subGList=sgList)
 renderGraph(T)
+#Return the tree too
+return(T)
 }
 }
 
