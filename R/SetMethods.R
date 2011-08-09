@@ -108,7 +108,11 @@ setMethod("getData",signature=signature(obj="flowMerge"),function(obj){getData(a
 setMethod("plot",signature=signature(x="flowObj",y="missing"),
           function(x,new.window=TRUE,...){
             #TODO include some code so that the dimension names are chosen correctly.
-            comb<-as.matrix(combn(x@varNames,2));
+            if(length(x@varNames)>2){
+                comb<-as.matrix(combn(x@varNames,2));
+            }else{
+                comb<-matrix(x@varNames)
+            }
             if(new.window){
             par(mfrow=c(ceiling(sqrt(dim(comb)[2])),ceiling(sqrt(dim(comb)[2]))))
             }
@@ -124,7 +128,11 @@ setMethod("plot",signature=signature(x="flowObj",y="missing"),
 setMethod("plot",signature=signature(x="flowMerge",y="missing"),
           function(x,new.window=FALSE,...){
             #TODO include some code so that the dimension names are chosen correctly.
-            comb<-as.matrix(combn(x@varNames,2));
+            if(length(x@varNames)>2){
+                comb<-as.matrix(combn(x@varNames,2));
+            }else{
+                comb<-matrix(x@varNames)
+            }
             if(new.window){
             par(mfrow=c(ceiling(sqrt(dim(comb)[2])),ceiling(sqrt(dim(comb)[2]))))
             }
