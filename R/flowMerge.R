@@ -154,13 +154,13 @@ mergeClusters2 <- function(object, a, b){
     if(dims[1]==2){
 	#Removed the t(), added drop=FALSE. Cleaner
       object@mu <- ((object@mu[-b,,drop=FALSE]));
-	  object@z <- matrix(object@z[,-b]);
+	  object@z <- (object@z[,-b,drop=FALSE]);
     }else if(dims[2]==1){
-		object@mu<-matrix(object@mu[-b,,drop=FALSE])
-		object@z <- object@z[,-b];
+		object@mu<-(object@mu[-b,,drop=FALSE])
+		object@z <- object@z[,-b,drop=FALSE];
 	}else {
       object@mu<-object@mu[-b,,drop=FALSE];
-      object@z <- object@z[,-b];
+      object@z <- object@z[,-b,drop=FALSE];
     }
   
     
