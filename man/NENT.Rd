@@ -23,11 +23,11 @@ NENT(x)
 \section{Warning}{This function doesn't do enough error checking and will try to extract the entropy from a list of anything.}
 \seealso{ \link{ENT},\link{merge},\link{flowMerge-class} }
 \examples{
-data(RituximabFlowClustFit)
-data(rituximab)
-o<-flowObj(flowClust.res[[which.max(flowMerge:::BIC(flowClust.res))]],rituximab);
-m<-merge(o);
-flowMerge:::ENT(m);
-flowMerge:::NENT(m);
+#data(RituximabFlowClustFit)
+#data(rituximab)
+#o<-flowObj(flowClust.res[[which.max(flowMerge:::BIC(flowClust.res))]],rituximab);
+#m<-merge(o);
+#flowMerge:::ENT(m);
+#flowMerge:::NENT(m);
 }
 \keyword{misc}

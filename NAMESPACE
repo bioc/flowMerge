@@ -19,7 +19,6 @@ exportMethods(
     "split"
 )
 exportClasses(
-    "flowClust",
      "flowMerge",
      "flowObj" 
 )

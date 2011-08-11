@@ -15,13 +15,13 @@
 \item{x = "flowObj", y = "missing"}{ \code{x} is a \code{flowObj} object. }
 }}
 \examples{
-data(rituximab)
-data(RituximabFlowClustFit)
-o<-flowObj(flowClust.res[[which.max(flowMerge:::BIC(flowClust.res))]],rituximab);
-m<-merge(o);
-i<-fitPiecewiseLinreg(m);
-m<-m[[i]];
-plot(m,pch=20,level=0.9);
+#data(rituximab)
+#data(RituximabFlowClustFit)
+#o<-flowObj(flowClust.res[[which.max(flowMerge:::BIC(flowClust.res))]],rituximab);
+#m<-merge(o);
+#i<-fitPiecewiseLinreg(m);
+#m<-m[[i]];
+#plot(m,pch=20,level=0.9);
 }
 \seealso{\link[flowClust]{flowClust}}
 \keyword{methods}

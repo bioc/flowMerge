@@ -27,10 +27,10 @@ merge(x,y,...)
 
 \seealso{ \link[flowClust]{flowClust},\link{flowObj} }
 \examples{
-data(rituximab)
-data(RituximabFlowClustFit)
-o<-flowObj(flowClust.res[[which.max(BIC(flowClust.res))]],rituximab)
-m<-merge(o);
+#data(rituximab)
+#data(RituximabFlowClustFit)
+#o<-flowObj(flowClust.res[[which.max(BIC(flowClust.res))]],rituximab)
+#m<-merge(o);
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

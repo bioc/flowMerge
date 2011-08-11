@@ -25,7 +25,7 @@
   
 %}
 \examples{
-data(RituximabFlowClustFit)
-summary(flowClust.res);
+#data(RituximabFlowClustFit)
+#summary(flowClust.res);
 }
 \keyword{datasets}

@@ -23,10 +23,10 @@ flowObj(flowC = NULL, flowF = NULL)
 \author{ Greg Finak \email{<greg.finak@ircm.qc.ca>}, Raphael Gottardo \email{<raphael.gottardo@ircm.qc.ca>} }
 \seealso{ \link{flowObj-class} }
 \examples{
-data(rituximab)
-data(RituximabFlowClustFit)
-o<-flowObj(flowClust.res[[which.max(flowMerge:::BIC(flowClust.res))]],rituximab);
-m<-merge(o);
+#data(rituximab)
+#data(RituximabFlowClustFit)
+#o<-flowObj(flowClust.res[[which.max(flowMerge:::BIC(flowClust.res))]],rituximab);
+#m<-merge(o);
 
 }
 \keyword{misc}

@@ -17,10 +17,10 @@
     An unnamed list of \code{flowMerge} objects with the \code{k}th element corresponding to the k-cluster merged solution.
 }
 \examples{
-data(rituximab)
-data(RituximabFlowClustFit)
-o<-flowObj(flowClust.res[[which.max(flowMerge:::BIC(flowClust.res))]],rituximab);
-m<-merge(o);
+#data(rituximab)
+#data(RituximabFlowClustFit)
+#o<-flowObj(flowClust.res[[which.max(flowMerge:::BIC(flowClust.res))]],rituximab);
+#m<-merge(o);
 }
 \references{ Finak G, Bashasharti A, Brinkmann R, Gottardo R. Merging Mixture Model Components for Improved Cell Population Identification in High Throughput Flow Cytometry Data (To Appear)}
 \keyword{methods}

@@ -23,11 +23,11 @@ fitPiecewiseLinreg(x, plot=FALSE, normalized=TRUE, ...)
 \references{ Finak G, Bashasharti A, Brinkmann R, Gottardo R. Merging Mixture Model Components for Improved Cell Population Identification in High Throughput Flow Cytometry Data; Advances in Bioinformatics (To Appear)}\author{ Greg Finak \email{<greg.finak@ircm.qc.ca>} }
 \seealso{ \link{merge}}
 \examples{
-data(rituximab)
-data(RituximabFlowClustFit)
-o<-flowObj(flowClust.res[[which.max(BIC(flowClust.res))]],rituximab);
-m<-merge(o)
-i<-fitPiecewiseLinreg(m);
+#data(rituximab)
+#data(RituximabFlowClustFit)
+#o<-flowObj(flowClust.res[[which.max(BIC(flowClust.res))]],rituximab);
+#m<-merge(o)
+#i<-fitPiecewiseLinreg(m);
 }
 \keyword{misc}
 
