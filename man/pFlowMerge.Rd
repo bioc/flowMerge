@@ -43,9 +43,9 @@ data(rituximab)
 \dontrun{cl<-makeSOCKcluster(rep("finakg@localhost",7))}
 \dontrun{result<-pFlowMerge(rituximab,cl,varNames=c("FSC.H","SSC.H"))}
 \dontrun{plot(result)}
-cl<-NULL;
-result<-pFlowMerge(rituximab,cl=NULL,varNames=c("FSC.H","SSC.H"),K=1:8);
-plot(result);
+#cl<-NULL;
+#result<-pFlowMerge(rituximab,cl=NULL,varNames=c("FSC.H","SSC.H"),K=1:8);
+#plot(result);
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

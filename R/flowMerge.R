@@ -127,7 +127,7 @@ mergeClusters2 <- function(object, a, b){
     dims<-dim(object@mu);
     object@z[,a] <- object@z[,a] + object@z[,b]
     object@sigma[a,,]<-SIGMA;
-	sigma<-object@sigma[-b,,];
+	sigma<-object@sigma[-b,,,drop=FALSE];
 	if(!is.array(sigma)&dy==1){
 		#One dimensional case.. need to make this a proper array
 		object@sigma<-array(data=sigma,c(py-1,dy,dy))
@@ -140,13 +140,14 @@ mergeClusters2 <- function(object, a, b){
 		object@sigma<-sigma
 	}
     if(dims[1]==2){
-      object@mu <- t(matrix(object@mu[-b,]));
+	#Removed the t(), added drop=FALSE. Cleaner
+      object@mu <- ((object@mu[-b,,drop=FALSE]));
 	  object@z <- matrix(object@z[,-b]);
     }else if(dims[2]==1){
-		object@mu<-matrix(object@mu[-b,])
+		object@mu<-matrix(object@mu[-b,,drop=FALSE])
 		object@z <- object@z[,-b];
 	}else {
-      object@mu<-object@mu[-b,];
+      object@mu<-object@mu[-b,,drop=FALSE];
       object@z <- object@z[,-b];
     }
   
@@ -161,8 +162,8 @@ mergeClusters2 <- function(object, a, b){
     return(object)
 }
 
-.computeDeltaE<-function(object,a,b){
-	list(a=a,b=b,e=-2*sum(object@z[,c(a,b)]*log(object@z[,c(a,b)]),na.rm=T)+2*sum(rowSums(object@z[,c(a,b)])*log(rowSums(object@z[,c(a,b)])),na.rm=T));
+.computeDeltaE<-function(z,a,b){
+	list(a=a,b=b,e=-2*sum(z[,c(a,b)]*log(z[,c(a,b)]),na.rm=T)+2*sum(rowSums(z[,c(a,b)])*log(rowSums(z[,c(a,b)])),na.rm=T));
 }
 
 .compMD<-function(object,a,b){
@@ -177,50 +178,49 @@ mergeClusters2 <- function(object, a, b){
 }
 
 mergeClusters <- function(object,metric="entropy") {
-    K <- object@K
-    minEnt <- Inf
-    maxPLL<- -Inf
+	K <- object@K
+	minEnt <- Inf
+	maxPLL<- -Inf
 	a<-0;
 	b<-0;
-    if(!is.na(match("doMC",installed.packages()))){
-		require(doMC)
-        doMC::registerDoMC();
-    }
-	  if(any(grepl("doMC",loadedNamespaces()))){
-    	if(metric=="entropy"){
-    		resObject<-foreach (a = 1:(K-1),.combine=.combFunc1, .options.multicore=list(preschedule=TRUE))%dopar%{ 
-     			foreach (b = (a+1):K,.combine=.combFunc1,.options.multicore = list(preschedule=TRUE)) %dopar%{
-      				.computeDeltaE(object,a,b);
+	if(length(grep("multicore",loadedNamespaces()))==1&length(grep("doMC",loadedNamespaces()))==1)
+	{
+		doMC::registerDoMC();
+
+		if(metric=="entropy"){
+			resObject<-foreach (a = 1:(K-1),.combine=.combFunc1, .options.multicore=list(preschedule=TRUE))%dopar%{ 
+				foreach (b = (a+1):K,.combine=.combFunc1,.options.multicore = list(preschedule=TRUE)) %dopar%{
+					.computeDeltaE(object@z,a,b);
 				}
-        
-    		}
+
+			}
 		}
 		else if(metric=="mahalanobis"){
-        	resObject<-foreach (a = 1:(K-1),.combine=.combFunc2, .options.multicore=list(preschedule=TRUE))%dopar%{ 
-     			foreach (b = (a+1):K,.combine=.combFunc2,.options.multicore = list(preschedule=TRUE)) %dopar%{
-         			.compMD(object,a,b);
-        		}
-      		}
-    	}    
-		resObject
-	}
-	else{
-    	if(metric=="entropy"){
-    		resObject<-foreach (a = 1:(K-1),.combine=.combFunc1, .options.multicore=list(preschedule=TRUE))%do%{ 
-     			foreach (b = (a+1):K,.combine=.combFunc1,.options.multicore = list(preschedule=TRUE)) %do%{
-        			.computeDeltaE(object,a,b);
-      			}
-    		}
+			resObject<-foreach (a = 1:(K-1),.combine=.combFunc2, .options.multicore=list(preschedule=TRUE))%dopar%{ 
+				foreach (b = (a+1):K,.combine=.combFunc2,.options.multicore = list(preschedule=TRUE)) %dopar%{
+					.compMD(object,a,b);
+				}
+			}
+		}    
+		return(resObject)
+	} else {
+			if(metric=="entropy"){
+				resObject<-foreach (a = 1:(K-1),.combine=.combFunc1, .options.multicore=list(preschedule=TRUE))%do%{ 
+					foreach (b = (a+1):K,.combine=.combFunc1,.options.multicore = list(preschedule=TRUE)) %do%{
+						.computeDeltaE(object@z,a,b);
+					}
+				}
+			}
+			else if(metric=="mahalanobis"){
+				resObject<-foreach (a = 1:(K-1),.combine=.combFunc2, .options.multicore=list(preschedule=TRUE))%do%{ 
+					foreach (b = (a+1):K,.combine=.combFunc2,.options.multicore = list(preschedule=TRUE)) %do%{
+						.compMD(object,a,b);
+					}
+				}
+			}    
+			return(resObject);	
 		}
-		else if(metric=="mahalanobis"){
-        	resObject<-foreach (a = 1:(K-1),.combine=.combFunc2, .options.multicore=list(preschedule=TRUE))%do%{ 
-     			foreach (b = (a+1):K,.combine=.combFunc2,.options.multicore = list(preschedule=TRUE)) %do%{
-         			.compMD(object,a,b);
-        		}
-      		}
-    	}    
 	}
-}
 
 BIC <- function(x)as.numeric(unlist(lapply(x,function(q)try(q@BIC,silent=TRUE))))
 ICL <- function(x)as.numeric(unlist(lapply(x,function(q)try(q@ICL,silent=TRUE))))
