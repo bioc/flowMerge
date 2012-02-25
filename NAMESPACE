@@ -5,7 +5,8 @@ import(methods);
 importClassesFrom( graph, graphNEL);
 importMethodsFrom(rrcov,getData);
 importMethodsFrom(Rgraphviz,renderGraph)
-importFrom(graphics, lines, par, plot);
+importFrom(BiocGenerics, plot)
+importFrom(graphics, lines, par);
 importFrom(Rgraphviz,layoutGraph)
 importFrom(stats, coefficients, lm);
 importFrom(utils,combn);
