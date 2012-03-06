@@ -1,4 +1,15 @@
 
+countModes<-function(x){
+    if(class(x)=="matrix"|class(x)=="vector"){
+	x<-as.matrix(x);
+	if(ncol(x)>4){
+	 stop("Can only do mode counting in four or fewer dimensions simultaneously")
+	}
+    }
+    tmp<-feature:::featureSignif(x)
+    sum(diff(which(tmp$curv)[sapply(tmp$fhat$x.grid[[1]][which(tmp$curv)],function(x)x>range(tmp$x)[1]&x<range(tmp$x)[2])])>1)+1
+}
+
 checkForRemoteErrors <- function(val)
     {
         count <- 0

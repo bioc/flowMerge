@@ -10,7 +10,7 @@ License: Artistic-2.0
 LazyLoad: yes
 Collate: SetClasses.R SetMethods.R flowMerge.R
 biocViews: Bioinformatics, Clustering, FlowCytometry
-Depends: Rgraphviz, flowClust, flowCore, methods,snow,foreach,graph
+Depends: Rgraphviz, flowClust, flowCore, methods,snow,foreach,graph,feature
 Suggests: Rgraphviz
 Enhances: doMC, multicore
 Imports:rrcov, flowClust,flowCore, graphics, methods, rrcov, stats, utils, BiocGenerics (>= 0.1.6)
