@@ -176,7 +176,7 @@ setMethod("fitPiecewiseLinreg",signature=signature(x="list"),{
             }
             #bic<-c(l*log(r2/l)+2*log(l),l*log(r/l)+2*log(l));        
             #m<-which.min(bic);        
-            m<-which.min(r2,r)
+            m<-which.min(c(r2,r))
 	    if(plot){
                 if(normalized){
                     c1<-coefficients(lm(entropy~N,subset=c(1:m)));c2<-coefficients(lm(entropy~N,subset=c(m:l)))
