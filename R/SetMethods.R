@@ -174,9 +174,10 @@ setMethod("fitPiecewiseLinreg",signature=signature(x="list"),{
             }else{
                 r2<-sum(lm(entropy~K)$residuals^2);
             }
-            bic<-c(l*log(r2/l)+2*log(l),l*log(r/l)+5*log(l));        
-            m<-which.min(bic);        
-            if(plot){
+            #bic<-c(l*log(r2/l)+2*log(l),l*log(r/l)+2*log(l));        
+            #m<-which.min(bic);        
+            m<-which.min(r2,r)
+	    if(plot){
                 if(normalized){
                     c1<-coefficients(lm(entropy~N,subset=c(1:m)));c2<-coefficients(lm(entropy~N,subset=c(m:l)))
                     color<-rep(1,l);
