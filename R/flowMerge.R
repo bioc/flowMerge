@@ -6,7 +6,7 @@ countModes<-function(x){
 	 stop("Can only do mode counting in four or fewer dimensions simultaneously")
 	}
     }
-    tmp<-feature:::featureSignif(x)
+    tmp<-featureSignif(x)
     sum(diff(which(tmp$curv)[sapply(tmp$fhat$x.grid[[1]][which(tmp$curv)],function(x)x>range(tmp$x)[1]&x<range(tmp$x)[2])])>1)+1
 }
 

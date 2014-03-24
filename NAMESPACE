@@ -1,9 +1,8 @@
 export(fitPiecewiseLinreg,pFlowMerge,checkForRemoteErrors,flowObj,ENT,NENT,BIC,ICL,split,map,ptree);
-import(BiocGenerics)
 import(flowClust);
 import(flowCore);
 import(methods);
-importClassesFrom( graph, graphNEL);
+importClassesFrom(graph, graphNEL);
 importMethodsFrom(rrcov,getData);
 importMethodsFrom(flowClust,Map)
 importMethodsFrom(Rgraphviz,renderGraph)

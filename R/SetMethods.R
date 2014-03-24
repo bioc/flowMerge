@@ -153,7 +153,7 @@ setMethod("fitPiecewiseLinreg",signature=signature(x="list"),{
             stop("x is not a valid list of flowMerge objects");        
         }
 		#@merged slot holds the number of events merged at that point
-        entropy<-flowMerge:::ENT(x);
+        entropy<-ENT(x);
         N<-(unlist(lapply(x,function(y)y@merged)))
         N<-cumsum(c(0,N[-length(N)]))
         K<-unlist(lapply(x,function(y)y@K));

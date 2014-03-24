@@ -1,7 +1,7 @@
 Package: flowMerge
 Type: Package
 Title: Cluster Merging for Flow Cytometry Data
-Version: 2.11.2
+Version: 2.11.3
 Date: 2011-05-26
 Author: Greg Finak <gfinak@fhcrc.org>, Raphael Gottardo
         <rgottard@fhcrc.org>
@@ -13,10 +13,8 @@ Description: Merging of mixture components for model-based automated
 License: Artistic-2.0
 LazyLoad: yes
 Collate: SetClasses.R SetMethods.R flowMerge.R
-Depends: Rgraphviz, flowClust, flowCore,
-        methods,snow,foreach,graph,feature
-Suggests: Rgraphviz
+Depends: graph,feature,flowClust,Rgraphviz,foreach,snow
 Enhances: doMC, multicore
-Imports: rrcov, flowClust,flowCore, graphics, methods, rrcov, stats,
-        utils, BiocGenerics (>= 0.1.6)
+Imports: rrcov,flowCore, graphics, methods, stats,
+        utils
 biocViews: Clustering, FlowCytometry
