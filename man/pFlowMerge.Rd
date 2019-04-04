@@ -6,7 +6,10 @@
   Calls the flowMerge methods to compute the merged solution from a flowClust object or set of objects in a parallelized manner using the \code{snow} framework.
 }
 \usage{
-pFlowMerge(flowData, cl, K = 1:15, B.init = 100, tol.init = 0.01, tol = 1e-05, B = 500, randomStart = 10, nu = 4, nu.est = 0, trans = 1, varNames = NA)
+pFlowMerge(flowData, cl, K = 1:15, 
+   B.init = 100, tol.init = 0.01, tol = 1e-05, 
+   B = 500, randomStart = 10, nu = 4, nu.est = 0, 
+   trans = 1, varNames = NA)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

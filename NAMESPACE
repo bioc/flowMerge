@@ -11,7 +11,8 @@ importFrom(Rgraphviz,layoutGraph)
 importFrom(stats, coefficients, lm);
 importFrom(utils,combn);
 importFrom(feature,featureSignif)
-
+importFrom("grDevices", "rgb")
+importFrom("stats", "mahalanobis", "qf")
 exportMethods(
     "getData",
     "merge",

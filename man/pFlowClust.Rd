@@ -6,7 +6,10 @@
   A parallelized call to flowClust via the snow package and framework. Not called by the user.
 }
 \usage{
-pFlowClust(flowData,cl, K = 1:15, B.init = 100, tol.init = 0.01, tol = 1e-05, B = 1000, randomStart = 50, nu = 4, nu.est = 1, trans = 1, varNames = NA)
+pFlowClust(flowData,cl, K = 1:15, B.init = 100,
+    tol.init = 0.01, tol = 1e-05, B = 1000, 
+    randomStart = 50, nu = 4, nu.est = 1, 
+    trans = 1, varNames = NA)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
