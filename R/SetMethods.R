@@ -15,7 +15,7 @@ setMethod("merge",signature=signature(x="flowObj",y="missing"),function(x,metric
 	#set the population names for the initial BIC clustering
 	rownames(resultObject[[k]]@mu)<-as.character(1:d)
 	
-  s <- apply(resultObject[[k]]@sigma,1,function(x){xx<-eigen(x);list(solve(xx$vectors%*%sqrt(diag(xx$values,ncl,ncl))%*%t(xx$vectors),LINPACK=TRUE));});
+  s <- apply(resultObject[[k]]@sigma,1,function(x){xx<-eigen(x);list(solve(xx$vectors%*%sqrt(diag(xx$values,ncl,ncl))%*%t(xx$vectors)));});
   #resultObject[[k]]@ssd<- 2*sum(sapply(1:d,function(i)sapply(1:d,function(j)sqrt(sum((s[[i]][[1]]%*%resultObject[[k]]@mu[i,]-s[[j]][[1]]%*%resultObject[[k]]@mu[j,])^2)))))
 
   if(k > 2){
@@ -83,7 +83,7 @@ setMethod("updateU", signature = signature(object = "flowMerge"), function(objec
 #  }
   #if(require(multicore)&require(doMC)){
    # registerDoMC();
-    #u<-do.call(cbind,mclapply(as.list(1:object@K),function(i){s<-solve(object@sigma[i,,],LINPACK=TRUE);apply(dprime,1,function(x)(x-object@mu[i,])%*%s%*%(x-object@mu[i,]))}))
+    #u<-do.call(cbind,mclapply(as.list(1:object@K),function(i){s<-solve(object@sigma[i,,]);apply(dprime,1,function(x)(x-object@mu[i,])%*%s%*%(x-object@mu[i,]))}))
      u<-.computeU(object,dprime);
  #    if(!is.infinite(object@nu)){
  #     object@u <- (length(q)+object@nu)/(u+object@nu)
@@ -92,7 +92,7 @@ setMethod("updateU", signature = signature(object = "flowMerge"), function(objec
  #    }
 
 #  }else{
-#      u<-sapply(1:object@K,function(i){s<-solve(object@sigma[i,,],LINPACK=TRUE);apply(dprime,1,function(x)(x-object@mu[i,])%*%s%*%(x-object@mu[i,]))})
+#      u<-sapply(1:object@K,function(i){s<-solve(object@sigma[i,,]);apply(dprime,1,function(x)(x-object@mu[i,])%*%s%*%(x-object@mu[i,]))})
 #     if(!is.infinite(object@nu)){
 #      object@u <- (length(q)+object@nu)/(u+object@nu)
 #     }else{
